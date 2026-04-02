@@ -1,3 +1,10 @@
+/*
+ * cliente.h
+ *
+ *  Created on: 1 abr 2026
+ *      Author: s.armoa
+ */
+
 #ifndef SERVER_SRC_USUARIO_USUARIO_H_
 #define SERVER_SRC_USUARIO_USUARIO_H_
 
