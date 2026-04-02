@@ -42,7 +42,7 @@ int imprimirMenu(int *opcion) {
 	return 0;
 }
 int escogerOpcion(int *opcion) {
-	int ce = 5;
+	//int ce = 5;
 //	Aeropuerto aeropuertoe;
 	switch (*opcion) {
 	case 1:
@@ -51,55 +51,55 @@ int escogerOpcion(int *opcion) {
 //		if (ce == 0) {
 //			printf("Archivos cargados en la base de datos\n");
 //		}
-//		break;
+		break;
 	case 2:
 //		crearEmpleado();
-//		break;
+		break;
 	case 3:
 //		eliminarEmpleado();
-//		break;
+		break;
 	case 4:
 //		actualizarEmpleado();
-//		break;
+		break;
 	case 5:
 //		verEmpleados();
-//		break;
+		break;
 	case 6:
 //		actualizarRestaurante();
-//		break;
+		break;
 	case 7:
 //		crearRestaurante();
-//		break;
+		break;
 	case 8:
 //		imprimirUsuarios();
 		break;
 	case 9:
 //		imprimirPedidos();
-//		break;
+		break;
 	case 10:
 //		crearProductos();
-//		break;
+		break;
 	case 11:
 //		eliminarProductos();
-//		break;
+		break;
 	case 12:
 //		actualizarProductos();
-//		break;
+		break;
 	case 13:
 //		verProductos();
-//		break;
+		break;
 	case 14:
 //		crearIngrediente();
-//		break;
+		break;
 	case 15:
 //		eliminarIngredientes();
-//		break;
+		break;
 	case 16:
 //		verIngredientes();
-//		break;
+		break;
 	case 17:
 //		crearPedido();
-//		break;
+		break;
 	case 18:
 		crearUsuario();
 		break;
@@ -116,8 +116,9 @@ int escogerOpcion(int *opcion) {
 		printf("No existe esa opcion\n");
 		break;
 	}
+	return 0;
 }
-int main(int argc, char **argv) {
+int main(void) {
     int opcion = 0;
     while (opcion != 21) {
         imprimirMenu(&opcion);
