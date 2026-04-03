@@ -2,33 +2,50 @@
 #include <stdlib.h>
 #include <string.h>
 #include "usuario/usuario.h"
+#include "aeropuerto/aeropuerto.h"   /* Ajusta la ruta si tu .h está en otra carpeta */
 
 #define OPCION_MIN 1
 #define OPCION_SALIR 21
 
 typedef enum {
     OPCION_CARGAR_CSV = 1,
-    OPCION_CREAR_EMPLEADO,
-    OPCION_ELIMINAR_EMPLEADO,
-    OPCION_ACTUALIZAR_EMPLEADO,
-    OPCION_VER_EMPLEADOS,
-    OPCION_ACTUALIZAR_RESTAURANTE,
-    OPCION_CREAR_RESTAURANTE,
-    OPCION_VER_CLIENTES,
-    OPCION_VER_PEDIDOS,
-    OPCION_CREAR_PRODUCTO,
-    OPCION_ELIMINAR_PRODUCTO,
-    OPCION_ACTUALIZAR_PRODUCTO,
-    OPCION_VER_PRODUCTOS,
-    OPCION_CREAR_INGREDIENTE,
-    OPCION_ELIMINAR_INGREDIENTE,
-    OPCION_VER_INGREDIENTES,
-    OPCION_CREAR_PEDIDO,
-    OPCION_CREAR_CLIENTE,
-    OPCION_ELIMINAR_CLIENTE,
-    OPCION_ACTUALIZAR_CLIENTE,
+
+    /* AEROPUERTOS */
+    OPCION_CREAR_AEROPUERTO,
+    OPCION_ELIMINAR_AEROPUERTO,
+    OPCION_ACTUALIZAR_AEROPUERTO,
+    OPCION_VER_AEROPUERTOS,
+
+    /* VUELOS */
+    OPCION_CREAR_VUELO,
+    OPCION_ELIMINAR_VUELO,
+    OPCION_ACTUALIZAR_VUELO,
+    OPCION_VER_VUELOS,
+
+    /* PASAJEROS */
+    OPCION_CREAR_PASAJERO,
+    OPCION_ELIMINAR_PASAJERO,
+    OPCION_ACTUALIZAR_PASAJERO,
+    OPCION_VER_PASAJEROS,
+
+    /* EQUIPAJE */
+    OPCION_REGISTRAR_EQUIPAJE,
+    OPCION_ELIMINAR_EQUIPAJE,
+    OPCION_VER_EQUIPAJE,
+
+    /* OPERACIONES */
+    OPCION_ASIGNAR_PASAJERO_A_VUELO,
+    OPCION_REGISTRAR_EQUIPAJE_A_PASAJERO,
+    OPCION_VER_PASAJEROS_POR_VUELO,
+    OPCION_VER_EQUIPAJE_POR_PASAJERO,
+
     OPCION_MENU_SALIR
 } OpcionMenu;
+
+/* ================= DATOS GLOBALES ================= */
+
+static Aeropuerto listaAeropuertos[MAX_AEROPUERTOS];
+static int totalAeropuertos = 0;
 
 /* ================= FUNCIONES AUXILIARES ================= */
 
@@ -70,6 +87,19 @@ int leerCaracter(char *caracter) {
     }
 
     limpiarBufferEntrada();
+    return 0;
+}
+
+int leerCadena(char *buffer, int tam) {
+    if (buffer == NULL || tam <= 0) {
+        return -1;
+    }
+
+    if (fgets(buffer, tam, stdin) == NULL) {
+        return -1;
+    }
+
+    buffer[strcspn(buffer, "\n")] = '\0';
     return 0;
 }
 
@@ -123,26 +153,37 @@ void mostrarFuncionNoDisponible(const char *nombreFuncion) {
 void mostrarMenu(void) {
     mostrarCabecera("MENU ADMINISTRADOR");
 
-    printf("1.  Cargar datos desde CSV\n");
-    printf("2.  Crear empleados\n");
-    printf("3.  Eliminar empleados\n");
-    printf("4.  Actualizar empleados\n");
-    printf("5.  Ver empleados\n");
-    printf("6.  Actualizar restaurantes\n");
-    printf("7.  Crear restaurantes\n");
-    printf("8.  Ver clientes\n");
-    printf("9.  Ver pedidos\n");
-    printf("10. Crear productos\n");
-    printf("11. Eliminar productos\n");
-    printf("12. Actualizar productos\n");
-    printf("13. Ver productos\n");
-    printf("14. Crear ingredientes\n");
-    printf("15. Eliminar ingredientes\n");
-    printf("16. Ver ingredientes\n");
-    printf("17. Crear pedidos\n");
-    printf("18. Crear cliente\n");
-    printf("19. Eliminar cliente\n");
-    printf("20. Actualizar cliente\n");
+    printf("1. Cargar aeropuertos, vuelos y pasajeros desde .csv\n");
+
+    printf("--- AEROPUERTOS ---\n");
+    printf("2.  Crear aeropuertos\n");
+    printf("3.  Eliminar aeropuerto\n");
+    printf("4.  Actualizar aeropuerto\n");
+    printf("5.  Ver aeropuertos\n");
+
+    printf("--- VUELOS ---\n");
+    printf("6.  Crear vuelo\n");
+    printf("7.  Eliminar vuelo\n");
+    printf("8.  Actualizar vuelo\n");
+    printf("9.  Ver vuelos\n");
+
+    printf("--- PASAJEROS ---\n");
+    printf("10. Crear pasajero\n");
+    printf("11. Eliminar pasajero\n");
+    printf("12. Actualizar pasajero\n");
+    printf("13. Ver pasajeros\n");
+
+    printf("--- EQUIPAJE ---\n");
+    printf("14. Registrar equipaje\n");
+    printf("15. Eliminar equipaje\n");
+    printf("16. Ver equipaje\n");
+
+    printf("--- OPERACIONES ---\n");
+    printf("17. Asignar pasajero a vuelo\n");
+    printf("18. Registrar equipaje a pasajero\n");
+    printf("19. Ver pasajeros por vuelo\n");
+    printf("20. Ver equipaje por pasajero\n");
+
     printf("21. Salir\n");
 }
 
@@ -166,98 +207,220 @@ int leerOpcionMenu(int *opcion) {
     return 0;
 }
 
-/* ================= ACCIONES ================= */
+/* ================= ACCIONES AEROPUERTOS ================= */
 
 void accionCargarCSV(void) {
+    char ruta[256];
+
     mostrarCabecera("CARGAR DATOS DESDE CSV");
-    printf("Cargando datos desde CSV...\n");
-    /* cargar_csvs(); */
+    printf("Introduce la ruta del CSV de aeropuertos: ");
+
+    if (leerCadena(ruta, sizeof(ruta)) != 0) {
+        printf("Error al leer la ruta.\n");
+        return;
+    }
+
+    if (aeropuerto_cargar_csv(listaAeropuertos, &totalAeropuertos, ruta) < 0) {
+        printf("No se pudieron cargar los aeropuertos.\n");
+    }
 }
 
-void accionCrearEmpleado(void) {
-    mostrarCabecera("CREAR EMPLEADO");
-    mostrarFuncionNoDisponible("Crear empleado");
-    /* crearEmpleado(); */
+void accionCrearAeropuerto(void) {
+    char codigo[MAX_CODIGO];
+    char nombre[MAX_NOMBRE];
+    char ciudad[MAX_CIUDAD];
+    char pais[MAX_PAIS];
+    int num_pistas;
+
+    mostrarCabecera("CREAR AEROPUERTO");
+
+    printf("Codigo: ");
+    if (leerCadena(codigo, sizeof(codigo)) != 0) {
+        printf("Error al leer el codigo.\n");
+        return;
+    }
+
+    printf("Nombre: ");
+    if (leerCadena(nombre, sizeof(nombre)) != 0) {
+        printf("Error al leer el nombre.\n");
+        return;
+    }
+
+    printf("Ciudad: ");
+    if (leerCadena(ciudad, sizeof(ciudad)) != 0) {
+        printf("Error al leer la ciudad.\n");
+        return;
+    }
+
+    printf("Pais: ");
+    if (leerCadena(pais, sizeof(pais)) != 0) {
+        printf("Error al leer el pais.\n");
+        return;
+    }
+
+    printf("Numero de pistas: ");
+    if (leerEntero(&num_pistas) != 0) {
+        return;
+    }
+
+    if (aeropuerto_crear(listaAeropuertos, &totalAeropuertos,
+                         codigo, nombre, ciudad, pais, num_pistas) == 0) {
+        printf("Aeropuerto creado correctamente.\n");
+    } else {
+        printf("No se pudo crear el aeropuerto.\n");
+    }
 }
 
-void accionEliminarEmpleado(void) {
-    mostrarCabecera("ELIMINAR EMPLEADO");
-    mostrarFuncionNoDisponible("Eliminar empleado");
-    /* eliminarEmpleado(); */
+void accionEliminarAeropuerto(void) {
+    char codigo[MAX_CODIGO];
+
+    mostrarCabecera("ELIMINAR AEROPUERTO");
+
+    printf("Codigo del aeropuerto a eliminar: ");
+    if (leerCadena(codigo, sizeof(codigo)) != 0) {
+        printf("Error al leer el codigo.\n");
+        return;
+    }
+
+    if (!confirmarAccion("¿Seguro que deseas eliminar este aeropuerto?")) {
+        printf("Operacion cancelada.\n");
+        return;
+    }
+
+    if (aeropuerto_eliminar(listaAeropuertos, &totalAeropuertos, codigo) == 0) {
+        printf("Aeropuerto eliminado correctamente.\n");
+    } else {
+        printf("No se pudo eliminar el aeropuerto.\n");
+    }
 }
 
-void accionActualizarEmpleado(void) {
-    mostrarCabecera("ACTUALIZAR EMPLEADO");
-    mostrarFuncionNoDisponible("Actualizar empleado");
-    /* actualizarEmpleado(); */
+void accionActualizarAeropuerto(void) {
+    char codigo[MAX_CODIGO];
+    char nuevo_nombre[MAX_NOMBRE];
+    char nueva_ciudad[MAX_CIUDAD];
+    char nuevo_pais[MAX_PAIS];
+    int nuevo_num_pistas;
+
+    mostrarCabecera("ACTUALIZAR AEROPUERTO");
+
+    printf("Codigo del aeropuerto a actualizar: ");
+    if (leerCadena(codigo, sizeof(codigo)) != 0) {
+        printf("Error al leer el codigo.\n");
+        return;
+    }
+
+    printf("Nuevo nombre (ENTER para no cambiar): ");
+    if (leerCadena(nuevo_nombre, sizeof(nuevo_nombre)) != 0) {
+        printf("Error al leer el nombre.\n");
+        return;
+    }
+
+    printf("Nueva ciudad (ENTER para no cambiar): ");
+    if (leerCadena(nueva_ciudad, sizeof(nueva_ciudad)) != 0) {
+        printf("Error al leer la ciudad.\n");
+        return;
+    }
+
+    printf("Nuevo pais (ENTER para no cambiar): ");
+    if (leerCadena(nuevo_pais, sizeof(nuevo_pais)) != 0) {
+        printf("Error al leer el pais.\n");
+        return;
+    }
+
+    printf("Nuevo numero de pistas (0 para no cambiar): ");
+    if (leerEntero(&nuevo_num_pistas) != 0) {
+        return;
+    }
+
+    if (aeropuerto_actualizar(listaAeropuertos, totalAeropuertos,
+                              codigo, nuevo_nombre, nueva_ciudad,
+                              nuevo_pais, nuevo_num_pistas) == 0) {
+        printf("Aeropuerto actualizado correctamente.\n");
+    } else {
+        printf("No se pudo actualizar el aeropuerto.\n");
+    }
 }
 
-void accionVerEmpleados(void) {
-    mostrarCabecera("VER EMPLEADOS");
-    mostrarFuncionNoDisponible("Ver empleados");
-    /* verEmpleados(); */
+void accionVerAeropuertos(void) {
+    mostrarCabecera("VER AEROPUERTOS");
+    aeropuerto_ver(listaAeropuertos, totalAeropuertos);
 }
 
-void accionActualizarRestaurante(void) {
-    mostrarCabecera("ACTUALIZAR RESTAURANTE");
-    mostrarFuncionNoDisponible("Actualizar restaurante");
+/* ================= RESTO DE ACCIONES ================= */
+
+void accionCrearVuelo(void) {
+    mostrarCabecera("CREAR VUELO");
+    mostrarFuncionNoDisponible("Crear vuelo");
 }
 
-void accionCrearRestaurante(void) {
-    mostrarCabecera("CREAR RESTAURANTE");
-    mostrarFuncionNoDisponible("Crear restaurante");
+void accionEliminarVuelo(void) {
+    mostrarCabecera("ELIMINAR VUELO");
+    mostrarFuncionNoDisponible("Eliminar vuelo");
 }
 
-void accionVerClientes(void) {
-    mostrarCabecera("VER CLIENTES");
-    mostrarFuncionNoDisponible("Ver clientes");
-    /* imprimirUsuarios(); */
+void accionActualizarVuelo(void) {
+    mostrarCabecera("ACTUALIZAR VUELO");
+    mostrarFuncionNoDisponible("Actualizar vuelo");
 }
 
-void accionVerPedidos(void) {
-    mostrarCabecera("VER PEDIDOS");
-    mostrarFuncionNoDisponible("Ver pedidos");
-    /* imprimirPedidos(); */
+void accionVerVuelos(void) {
+    mostrarCabecera("VER VUELOS");
+    mostrarFuncionNoDisponible("Ver vuelos");
 }
 
-void accionCrearProducto(void) {
-    mostrarCabecera("CREAR PRODUCTO");
-    mostrarFuncionNoDisponible("Crear producto");
+void accionCrearPasajero(void) {
+    mostrarCabecera("CREAR PASAJERO");
+    mostrarFuncionNoDisponible("Crear pasajero");
 }
 
-void accionEliminarProducto(void) {
-    mostrarCabecera("ELIMINAR PRODUCTO");
-    mostrarFuncionNoDisponible("Eliminar producto");
+void accionEliminarPasajero(void) {
+    mostrarCabecera("ELIMINAR PASAJERO");
+    mostrarFuncionNoDisponible("Eliminar pasajero");
 }
 
-void accionActualizarProducto(void) {
-    mostrarCabecera("ACTUALIZAR PRODUCTO");
-    mostrarFuncionNoDisponible("Actualizar producto");
+void accionActualizarPasajero(void) {
+    mostrarCabecera("ACTUALIZAR PASAJERO");
+    mostrarFuncionNoDisponible("Actualizar pasajero");
 }
 
-void accionVerProductos(void) {
-    mostrarCabecera("VER PRODUCTOS");
-    mostrarFuncionNoDisponible("Ver productos");
+void accionVerPasajeros(void) {
+    mostrarCabecera("VER PASAJEROS");
+    mostrarFuncionNoDisponible("Ver pasajeros");
 }
 
-void accionCrearIngrediente(void) {
-    mostrarCabecera("CREAR INGREDIENTE");
-    mostrarFuncionNoDisponible("Crear ingrediente");
+void accionRegistrarEquipaje(void) {
+    mostrarCabecera("REGISTRAR EQUIPAJE");
+    mostrarFuncionNoDisponible("Registrar equipaje");
 }
 
-void accionEliminarIngrediente(void) {
-    mostrarCabecera("ELIMINAR INGREDIENTE");
-    mostrarFuncionNoDisponible("Eliminar ingrediente");
+void accionEliminarEquipaje(void) {
+    mostrarCabecera("ELIMINAR EQUIPAJE");
+    mostrarFuncionNoDisponible("Eliminar equipaje");
 }
 
-void accionVerIngredientes(void) {
-    mostrarCabecera("VER INGREDIENTES");
-    mostrarFuncionNoDisponible("Ver ingredientes");
+void accionVerEquipaje(void) {
+    mostrarCabecera("VER EQUIPAJE");
+    mostrarFuncionNoDisponible("Ver equipaje");
 }
 
-void accionCrearPedido(void) {
-    mostrarCabecera("CREAR PEDIDO");
-    mostrarFuncionNoDisponible("Crear pedido");
+void accionAsignarPasajeroAVuelo(void) {
+    mostrarCabecera("ASIGNAR PASAJERO A VUELO");
+    mostrarFuncionNoDisponible("Asignar pasajero a vuelo");
+}
+
+void accionRegistrarEquipajeAPasajero(void) {
+    mostrarCabecera("REGISTRAR EQUIPAJE A PASAJERO");
+    mostrarFuncionNoDisponible("Registrar equipaje a pasajero");
+}
+
+void accionVerPasajerosPorVuelo(void) {
+    mostrarCabecera("VER PASAJEROS POR VUELO");
+    mostrarFuncionNoDisponible("Ver pasajeros por vuelo");
+}
+
+void accionVerEquipajePorPasajero(void) {
+    mostrarCabecera("VER EQUIPAJE POR PASAJERO");
+    mostrarFuncionNoDisponible("Ver equipaje por pasajero");
 }
 
 void accionCrearCliente(void) {
@@ -275,7 +438,6 @@ void accionEliminarCliente(void) {
 void accionActualizarCliente(void) {
     mostrarCabecera("ACTUALIZAR CLIENTE");
     mostrarFuncionNoDisponible("Actualizar cliente");
-    /* actualizarUsuario(); */
 }
 
 int accionSalir(void) {
@@ -302,80 +464,80 @@ int escogerOpcion(int *opcion) {
             accionCargarCSV();
             break;
 
-        case OPCION_CREAR_EMPLEADO:
-            accionCrearEmpleado();
+        case OPCION_CREAR_AEROPUERTO:
+            accionCrearAeropuerto();
             break;
 
-        case OPCION_ELIMINAR_EMPLEADO:
-            accionEliminarEmpleado();
+        case OPCION_ELIMINAR_AEROPUERTO:
+            accionEliminarAeropuerto();
             break;
 
-        case OPCION_ACTUALIZAR_EMPLEADO:
-            accionActualizarEmpleado();
+        case OPCION_ACTUALIZAR_AEROPUERTO:
+            accionActualizarAeropuerto();
             break;
 
-        case OPCION_VER_EMPLEADOS:
-            accionVerEmpleados();
+        case OPCION_VER_AEROPUERTOS:
+            accionVerAeropuertos();
             break;
 
-        case OPCION_ACTUALIZAR_RESTAURANTE:
-            accionActualizarRestaurante();
+        case OPCION_CREAR_VUELO:
+            accionCrearVuelo();
             break;
 
-        case OPCION_CREAR_RESTAURANTE:
-            accionCrearRestaurante();
+        case OPCION_ELIMINAR_VUELO:
+            accionEliminarVuelo();
             break;
 
-        case OPCION_VER_CLIENTES:
-            accionVerClientes();
+        case OPCION_ACTUALIZAR_VUELO:
+            accionActualizarVuelo();
             break;
 
-        case OPCION_VER_PEDIDOS:
-            accionVerPedidos();
+        case OPCION_VER_VUELOS:
+            accionVerVuelos();
             break;
 
-        case OPCION_CREAR_PRODUCTO:
-            accionCrearProducto();
+        case OPCION_CREAR_PASAJERO:
+            accionCrearPasajero();
             break;
 
-        case OPCION_ELIMINAR_PRODUCTO:
-            accionEliminarProducto();
+        case OPCION_ELIMINAR_PASAJERO:
+            accionEliminarPasajero();
             break;
 
-        case OPCION_ACTUALIZAR_PRODUCTO:
-            accionActualizarProducto();
+        case OPCION_ACTUALIZAR_PASAJERO:
+            accionActualizarPasajero();
             break;
 
-        case OPCION_VER_PRODUCTOS:
-            accionVerProductos();
+        case OPCION_VER_PASAJEROS:
+            accionVerPasajeros();
             break;
 
-        case OPCION_CREAR_INGREDIENTE:
-            accionCrearIngrediente();
+        case OPCION_REGISTRAR_EQUIPAJE:
+            accionRegistrarEquipaje();
             break;
 
-        case OPCION_ELIMINAR_INGREDIENTE:
-            accionEliminarIngrediente();
+        case OPCION_ELIMINAR_EQUIPAJE:
+            accionEliminarEquipaje();
             break;
 
-        case OPCION_VER_INGREDIENTES:
-            accionVerIngredientes();
+        case OPCION_VER_EQUIPAJE:
+            accionVerEquipaje();
             break;
 
-        case OPCION_CREAR_PEDIDO:
-            accionCrearPedido();
+        case OPCION_ASIGNAR_PASAJERO_A_VUELO:
+            accionAsignarPasajeroAVuelo();
             break;
 
-        case OPCION_CREAR_CLIENTE:
-            accionCrearCliente();
+        case OPCION_REGISTRAR_EQUIPAJE_A_PASAJERO:
+            accionRegistrarEquipajeAPasajero();
             break;
 
-        case OPCION_ELIMINAR_CLIENTE:
-            accionEliminarCliente();
+        case OPCION_VER_PASAJEROS_POR_VUELO:
+            accionVerPasajerosPorVuelo();
             break;
 
-        case OPCION_ACTUALIZAR_CLIENTE:
-            accionActualizarCliente();
+        case OPCION_VER_EQUIPAJE_POR_PASAJERO:
+            accionVerEquipajePorPasajero();
             break;
 
         case OPCION_MENU_SALIR:
