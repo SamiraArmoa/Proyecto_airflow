@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "usuario/usuario.h"
-#include "aeropuerto/aeropuerto.h"   /* Ajusta la ruta si tu .h está en otra carpeta */
+#include "aeropuerto/aeropuerto.h"
+#include "vuelo/vuelo.h"
 
 #define OPCION_MIN 1
 #define OPCION_SALIR 21
@@ -46,6 +47,9 @@ typedef enum {
 
 static Aeropuerto listaAeropuertos[MAX_AEROPUERTOS];
 static int totalAeropuertos = 0;
+
+static Vuelo listaVuelos[MAX_VUELOS];
+static int totalVuelos = 0;
 
 /* ================= FUNCIONES AUXILIARES ================= */
 
@@ -210,18 +214,33 @@ int leerOpcionMenu(int *opcion) {
 /* ================= ACCIONES AEROPUERTOS ================= */
 
 void accionCargarCSV(void) {
-    char ruta[256];
+    char rutaAeropuertos[256];
+    char rutaVuelos[256];
 
     mostrarCabecera("CARGAR DATOS DESDE CSV");
-    printf("Introduce la ruta del CSV de aeropuertos: ");
 
-    if (leerCadena(ruta, sizeof(ruta)) != 0) {
-        printf("Error al leer la ruta.\n");
+    printf("Introduce la ruta del CSV de aeropuertos: ");
+    if (leerCadena(rutaAeropuertos, sizeof(rutaAeropuertos)) != 0) {
+        printf("Error al leer la ruta de aeropuertos.\n");
         return;
     }
 
-    if (aeropuerto_cargar_csv(listaAeropuertos, &totalAeropuertos, ruta) < 0) {
+    if (aeropuerto_cargar_csv(listaAeropuertos, &totalAeropuertos, rutaAeropuertos) < 0) {
         printf("No se pudieron cargar los aeropuertos.\n");
+    } else {
+        printf("Aeropuertos cargados correctamente.\n");
+    }
+
+    printf("Introduce la ruta del CSV de vuelos: ");
+    if (leerCadena(rutaVuelos, sizeof(rutaVuelos)) != 0) {
+        printf("Error al leer la ruta de vuelos.\n");
+        return;
+    }
+
+    if (vuelo_cargar_csv(listaVuelos, &totalVuelos, rutaVuelos) < 0) {
+        printf("No se pudieron cargar los vuelos.\n");
+    } else {
+        printf("Vuelos cargados correctamente.\n");
     }
 }
 
@@ -346,27 +365,145 @@ void accionVerAeropuertos(void) {
     aeropuerto_ver(listaAeropuertos, totalAeropuertos);
 }
 
-/* ================= RESTO DE ACCIONES ================= */
+/* ================= ACCIONES VUELOS ================= */
 
 void accionCrearVuelo(void) {
+    char id[MAX_ID_VUELO];
+    char aerolinea[MAX_AEROLINEA];
+    char origen[MAX_CODIGO];
+    char destino[MAX_CODIGO];
+    char fecha[MAX_FECHA];
+    char hora_salida[MAX_HORA];
+    char hora_llegada[MAX_HORA];
+    int capacidad;
+
     mostrarCabecera("CREAR VUELO");
-    mostrarFuncionNoDisponible("Crear vuelo");
+
+    printf("ID del vuelo: ");
+    if (leerCadena(id, sizeof(id)) != 0) {
+        printf("Error al leer el ID del vuelo.\n");
+        return;
+    }
+
+    printf("Aerolínea: ");
+    if (leerCadena(aerolinea, sizeof(aerolinea)) != 0) {
+        printf("Error al leer la aerolinea.\n");
+        return;
+    }
+
+    printf("Origen: ");
+    if (leerCadena(origen, sizeof(origen)) != 0) {
+        printf("Error al leer el origen.\n");
+        return;
+    }
+
+    printf("Destino: ");
+    if (leerCadena(destino, sizeof(destino)) != 0) {
+        printf("Error al leer el destino.\n");
+        return;
+    }
+
+    printf("Fecha: ");
+    if (leerCadena(fecha, sizeof(fecha)) != 0) {
+        printf("Error al leer la fecha.\n");
+        return;
+    }
+
+    printf("Hora de salida: ");
+    if (leerCadena(hora_salida, sizeof(hora_salida)) != 0) {
+        printf("Error al leer la hora de salida.\n");
+        return;
+    }
+
+    printf("Hora de llegada: ");
+    if (leerCadena(hora_llegada, sizeof(hora_llegada)) != 0) {
+        printf("Error al leer la hora de llegada.\n");
+        return;
+    }
+
+    printf("Capacidad: ");
+    if (leerEntero(&capacidad) != 0) {
+        printf("Capacidad no valida.\n");
+        return;
+    }
+
+    if (vuelo_crear(listaVuelos, &totalVuelos, id, aerolinea, origen, destino,
+                    fecha, hora_salida, hora_llegada, capacidad) == 0) {
+        printf("Vuelo creado correctamente.\n");
+    } else {
+        printf("No se pudo crear el vuelo.\n");
+    }
 }
 
 void accionEliminarVuelo(void) {
+    char id[MAX_ID_VUELO];
+
     mostrarCabecera("ELIMINAR VUELO");
-    mostrarFuncionNoDisponible("Eliminar vuelo");
+
+    printf("ID del vuelo a eliminar: ");
+    if (leerCadena(id, sizeof(id)) != 0) {
+        printf("Error al leer el ID.\n");
+        return;
+    }
+
+    if (!confirmarAccion("¿Seguro que deseas eliminar este vuelo?")) {
+        printf("Operacion cancelada.\n");
+        return;
+    }
+
+    if (vuelo_eliminar(listaVuelos, &totalVuelos, id) == 0) {
+        printf("Vuelo eliminado correctamente.\n");
+    } else {
+        printf("No se pudo eliminar el vuelo.\n");
+    }
 }
 
 void accionActualizarVuelo(void) {
+    char id[MAX_ID_VUELO];
+    char nueva_hora_salida[MAX_HORA];
+    char nueva_hora_llegada[MAX_HORA];
+    int nueva_capacidad;
+
     mostrarCabecera("ACTUALIZAR VUELO");
-    mostrarFuncionNoDisponible("Actualizar vuelo");
+
+    printf("ID del vuelo a actualizar: ");
+    if (leerCadena(id, sizeof(id)) != 0) {
+        printf("Error al leer el ID.\n");
+        return;
+    }
+
+    printf("Nueva hora de salida (ENTER para no cambiar): ");
+    if (leerCadena(nueva_hora_salida, sizeof(nueva_hora_salida)) != 0) {
+        printf("Error al leer la hora de salida.\n");
+        return;
+    }
+
+    printf("Nueva hora de llegada (ENTER para no cambiar): ");
+    if (leerCadena(nueva_hora_llegada, sizeof(nueva_hora_llegada)) != 0) {
+        printf("Error al leer la hora de llegada.\n");
+        return;
+    }
+
+    printf("Nueva capacidad (0 para no cambiar): ");
+    if (leerEntero(&nueva_capacidad) != 0) {
+        printf("Capacidad no valida.\n");
+        return;
+    }
+
+    if (vuelo_actualizar(listaVuelos, totalVuelos, id,
+                         nueva_hora_salida, nueva_hora_llegada, nueva_capacidad) == 0) {
+        printf("Vuelo actualizado correctamente.\n");
+    } else {
+        printf("No se pudo actualizar el vuelo.\n");
+    }
 }
 
 void accionVerVuelos(void) {
     mostrarCabecera("VER VUELOS");
-    mostrarFuncionNoDisponible("Ver vuelos");
+    vuelo_ver(listaVuelos, totalVuelos);
 }
+
+/* ================= RESTO DE ACCIONES ================= */
 
 void accionCrearPasajero(void) {
     mostrarCabecera("CREAR PASAJERO");
