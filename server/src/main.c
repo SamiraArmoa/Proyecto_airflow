@@ -5,6 +5,7 @@
 #include "aeropuerto/aeropuerto.h"
 #include "vuelo/vuelo.h"
 #include "pasajero/pasajero.h"
+#include "equipaje/equipaje.h"
 
 #define OPCION_MIN 1
 #define OPCION_SALIR 21
@@ -85,6 +86,8 @@ static int totalVuelos = 0;
 static Pasajero listaPasajeros[MAX_PASAJEROS];
 static int totalPasajeros = 0;
 
+static Equipaje listaEquipaje[MAX_EQUIPAJES];
+static int totalEquipaje = 0;
 /* ================= FUNCIONES AUXILIARES ================= */
 
 void limpiarBufferEntrada(void) {
@@ -683,8 +686,30 @@ void accionAsignarPasajeroAVuelo(void){
 }
 
 void accionRegistrarEquipajeAPasajero(void) {
+    char dni[20];
+    char id_eq[MAX_ID_EQ];
+
     mostrarCabecera("REGISTRAR EQUIPAJE A PASAJERO");
-    mostrarFuncionNoDisponible("Registrar equipaje a pasajero");
+
+    printf("DNI pasajero: ");
+    if (leerCadena(dni, sizeof(dni)) != 0) return;
+
+    if (pasajero_buscar(listaPasajeros, totalPasajeros, dni) == -1) {
+        printf("El pasajero no existe.\n");
+        return;
+    }
+
+    printf("ID equipaje a asignar: ");
+    if (leerCadena(id_eq, sizeof(id_eq)) != 0) return;
+
+    if (equipaje_buscar(listaEquipaje, totalEquipaje, id_eq) == -1) {
+        printf("El equipaje no existe. Registralo primero (opcion 14).\n");
+        return;
+    }
+
+    printf("Equipaje '%s' ya esta asociado al pasajero '%s' por su DNI.\n",
+           id_eq, dni);
+    printf("Puedes verlo con la opcion 20.\n");
 }
 
 void accionVerPasajerosPorVuelo(void) {
@@ -728,25 +753,86 @@ void accionVerPasajerosPorVuelo(void) {
 }
 
 void accionVerEquipajePorPasajero(void) {
+    char dni[20];
+
     mostrarCabecera("VER EQUIPAJE POR PASAJERO");
-    mostrarFuncionNoDisponible("Ver equipaje por pasajero");
+
+    printf("DNI del pasajero: ");
+    if (leerCadena(dni, sizeof(dni)) != 0) return;
+
+    if (pasajero_buscar(listaPasajeros, totalPasajeros, dni) == -1) {
+        printf("El pasajero no existe.\n");
+        return;
+    }
+
+    equipaje_ver_por_pasajero(listaEquipaje, totalEquipaje, dni);
 }
 
 /* ================= EQUIPAJE Y OTROS ================= */
 
 void accionRegistrarEquipaje(void) {
+    char id_eq[MAX_ID_EQ];
+    char dni[20];
+    char tipo[MAX_TIPO_EQ];
+    float peso;
+    int facturado;
+    char buf[32];
+
     mostrarCabecera("REGISTRAR EQUIPAJE");
-    mostrarFuncionNoDisponible("Registrar equipaje");
+
+    printf("ID equipaje: ");
+    if (leerCadena(id_eq, sizeof(id_eq)) != 0) return;
+
+    printf("DNI pasajero: ");
+    if (leerCadena(dni, sizeof(dni)) != 0) return;
+
+    /* verificar que el pasajero existe */
+    if (pasajero_buscar(listaPasajeros, totalPasajeros, dni) == -1) {
+        printf("El pasajero no existe.\n");
+        return;
+    }
+
+    printf("Tipo (maleta/mochila/bulto): ");
+    if (leerCadena(tipo, sizeof(tipo)) != 0) return;
+
+    printf("Peso en kg: ");
+    if (leerCadena(buf, sizeof(buf)) != 0) return;
+    peso = (float)atof(buf);
+
+    printf("Facturado (1=si, 0=no): ");
+    if (leerEntero(&facturado) != 0) return;
+
+    if (equipaje_registrar(listaEquipaje, &totalEquipaje,
+                           id_eq, dni, tipo, peso, facturado) == 0) {
+        printf("Equipaje registrado correctamente.\n");
+    } else {
+        printf("No se pudo registrar el equipaje.\n");
+    }
 }
 
 void accionEliminarEquipaje(void) {
+    char id_eq[MAX_ID_EQ];
+
     mostrarCabecera("ELIMINAR EQUIPAJE");
-    mostrarFuncionNoDisponible("Eliminar equipaje");
+
+    printf("ID del equipaje a eliminar: ");
+    if (leerCadena(id_eq, sizeof(id_eq)) != 0) return;
+
+    if (!confirmarAccion("¿Seguro que deseas eliminar este equipaje?")) {
+        printf("Operacion cancelada.\n");
+        return;
+    }
+
+    if (equipaje_eliminar(listaEquipaje, &totalEquipaje, id_eq) == 0) {
+        printf("Equipaje eliminado correctamente.\n");
+    } else {
+        printf("No se pudo eliminar el equipaje.\n");
+    }
 }
 
 void accionVerEquipaje(void) {
     mostrarCabecera("VER EQUIPAJE");
-    mostrarFuncionNoDisponible("Ver equipaje");
+    equipaje_ver(listaEquipaje, totalEquipaje);
 }
 
 void accionCrearCliente(void) {
