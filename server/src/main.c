@@ -4,6 +4,7 @@
 #include "usuario/usuario.h"
 #include "aeropuerto/aeropuerto.h"
 #include "vuelo/vuelo.h"
+#include "pasajero/pasajero.h"
 
 #define OPCION_MIN 1
 #define OPCION_SALIR 21
@@ -50,6 +51,9 @@ static int totalAeropuertos = 0;
 
 static Vuelo listaVuelos[MAX_VUELOS];
 static int totalVuelos = 0;
+
+static Pasajero listaPasajeros[MAX_PASAJEROS];
+static int totalPasajeros = 0;
 
 /* ================= FUNCIONES AUXILIARES ================= */
 
@@ -211,11 +215,12 @@ int leerOpcionMenu(int *opcion) {
     return 0;
 }
 
-/* ================= ACCIONES AEROPUERTOS ================= */
+/* ================= ACCIONES CARGA CSV ================= */
 
 void accionCargarCSV(void) {
     char rutaAeropuertos[256];
     char rutaVuelos[256];
+    char rutaPasajeros[256];
 
     mostrarCabecera("CARGAR DATOS DESDE CSV");
 
@@ -242,7 +247,21 @@ void accionCargarCSV(void) {
     } else {
         printf("Vuelos cargados correctamente.\n");
     }
+
+    printf("Introduce la ruta del CSV de pasajeros: ");
+    if (leerCadena(rutaPasajeros, sizeof(rutaPasajeros)) != 0) {
+        printf("Error al leer la ruta de pasajeros.\n");
+        return;
+    }
+
+    if (pasajero_cargar_csv(listaPasajeros, &totalPasajeros, rutaPasajeros) < 0) {
+        printf("No se pudieron cargar los pasajeros.\n");
+    } else {
+        printf("Pasajeros cargados correctamente.\n");
+    }
 }
+
+/* ================= ACCIONES AEROPUERTOS ================= */
 
 void accionCrearAeropuerto(void) {
     char codigo[MAX_CODIGO];
@@ -503,27 +522,209 @@ void accionVerVuelos(void) {
     vuelo_ver(listaVuelos, totalVuelos);
 }
 
-/* ================= RESTO DE ACCIONES ================= */
+/* ================= ACCIONES PASAJEROS ================= */
 
 void accionCrearPasajero(void) {
+    char dni[MAX_DNI];
+    char nombre[MAX_NOMBRE_P];
+    char apellido[MAX_APELLIDO_P];
+    char email[MAX_EMAIL];
+    char telefono[MAX_TELEFONO];
+
     mostrarCabecera("CREAR PASAJERO");
-    mostrarFuncionNoDisponible("Crear pasajero");
+
+    printf("DNI: ");
+    if (leerCadena(dni, sizeof(dni)) != 0) {
+        printf("Error al leer el DNI.\n");
+        return;
+    }
+
+    printf("Nombre: ");
+    if (leerCadena(nombre, sizeof(nombre)) != 0) {
+        printf("Error al leer el nombre.\n");
+        return;
+    }
+
+    printf("Apellido: ");
+    if (leerCadena(apellido, sizeof(apellido)) != 0) {
+        printf("Error al leer el apellido.\n");
+        return;
+    }
+
+    printf("Email: ");
+    if (leerCadena(email, sizeof(email)) != 0) {
+        printf("Error al leer el email.\n");
+        return;
+    }
+
+    printf("Telefono: ");
+    if (leerCadena(telefono, sizeof(telefono)) != 0) {
+        printf("Error al leer el telefono.\n");
+        return;
+    }
+
+    if (pasajero_crear(listaPasajeros, &totalPasajeros, dni, nombre, apellido, email, telefono) == 0) {
+        printf("Pasajero creado correctamente.\n");
+    } else {
+        printf("No se pudo crear el pasajero.\n");
+    }
 }
 
 void accionEliminarPasajero(void) {
+    char dni[MAX_DNI];
+
     mostrarCabecera("ELIMINAR PASAJERO");
-    mostrarFuncionNoDisponible("Eliminar pasajero");
+
+    printf("DNI del pasajero a eliminar: ");
+    if (leerCadena(dni, sizeof(dni)) != 0) {
+        printf("Error al leer el DNI.\n");
+        return;
+    }
+
+    if (!confirmarAccion("¿Seguro que deseas eliminar este pasajero?")) {
+        printf("Operacion cancelada.\n");
+        return;
+    }
+
+    if (pasajero_eliminar(listaPasajeros, &totalPasajeros, dni) == 0) {
+        printf("Pasajero eliminado correctamente.\n");
+    } else {
+        printf("No se pudo eliminar el pasajero.\n");
+    }
 }
 
 void accionActualizarPasajero(void) {
+    char dni[MAX_DNI];
+    char nuevo_email[MAX_EMAIL];
+    char nuevo_telefono[MAX_TELEFONO];
+
     mostrarCabecera("ACTUALIZAR PASAJERO");
-    mostrarFuncionNoDisponible("Actualizar pasajero");
+
+    printf("DNI del pasajero a actualizar: ");
+    if (leerCadena(dni, sizeof(dni)) != 0) {
+        printf("Error al leer el DNI.\n");
+        return;
+    }
+
+    printf("Nuevo email (ENTER para no cambiar): ");
+    if (leerCadena(nuevo_email, sizeof(nuevo_email)) != 0) {
+        printf("Error al leer el email.\n");
+        return;
+    }
+
+    printf("Nuevo telefono (ENTER para no cambiar): ");
+    if (leerCadena(nuevo_telefono, sizeof(nuevo_telefono)) != 0) {
+        printf("Error al leer el telefono.\n");
+        return;
+    }
+
+    if (pasajero_actualizar(listaPasajeros, totalPasajeros, dni, nuevo_email, nuevo_telefono) == 0) {
+        printf("Pasajero actualizado correctamente.\n");
+    } else {
+        printf("No se pudo actualizar el pasajero.\n");
+    }
 }
 
 void accionVerPasajeros(void) {
     mostrarCabecera("VER PASAJEROS");
-    mostrarFuncionNoDisponible("Ver pasajeros");
+    pasajero_ver(listaPasajeros, totalPasajeros);
 }
+
+/* ================= OPERACIONES ================= */
+
+void accionAsignarPasajeroAVuelo(void) {
+    char dni[MAX_DNI];
+    char id_vuelo[MAX_ID_VUELO];
+
+    mostrarCabecera("ASIGNAR PASAJERO A VUELO");
+
+    printf("DNI del pasajero: ");
+    if (leerCadena(dni, sizeof(dni)) != 0) {
+        printf("Error al leer el DNI.\n");
+        return;
+    }
+
+    printf("ID del vuelo: ");
+    if (leerCadena(id_vuelo, sizeof(id_vuelo)) != 0) {
+        printf("Error al leer el ID del vuelo.\n");
+        return;
+    }
+
+    if (vuelo_buscar(listaVuelos, totalVuelos, id_vuelo) == -1) {
+        printf("El vuelo no existe.\n");
+        return;
+    }
+
+    if (pasajero_buscar(listaPasajeros, totalPasajeros, dni) == -1) {
+        printf("El pasajero no existe.\n");
+        return;
+    }
+
+    if (vuelo_reservar_asiento(listaVuelos, totalVuelos, id_vuelo) != 0) {
+        printf("No se pudo reservar asiento en el vuelo.\n");
+        return;
+    }
+
+    if (pasajero_asignar_vuelo(listaPasajeros, totalPasajeros, dni, id_vuelo) != 0) {
+        vuelo_liberar_asiento(listaVuelos, totalVuelos, id_vuelo);
+        printf("No se pudo asignar el vuelo al pasajero.\n");
+        return;
+    }
+
+    printf("Pasajero asignado al vuelo correctamente.\n");
+}
+
+void accionRegistrarEquipajeAPasajero(void) {
+    mostrarCabecera("REGISTRAR EQUIPAJE A PASAJERO");
+    mostrarFuncionNoDisponible("Registrar equipaje a pasajero");
+}
+
+void accionVerPasajerosPorVuelo(void) {
+    char id_vuelo[MAX_ID_VUELO];
+    int encontrados = 0;
+    int i, j;
+
+    mostrarCabecera("VER PASAJEROS POR VUELO");
+
+    printf("ID del vuelo: ");
+    if (leerCadena(id_vuelo, sizeof(id_vuelo)) != 0) {
+        printf("Error al leer el ID del vuelo.\n");
+        return;
+    }
+
+    if (vuelo_buscar(listaVuelos, totalVuelos, id_vuelo) == -1) {
+        printf("El vuelo no existe.\n");
+        return;
+    }
+
+    printf("\nPasajeros asignados al vuelo %s:\n\n", id_vuelo);
+
+    for (i = 0; i < totalPasajeros; i++) {
+        for (j = 0; j < listaPasajeros[i].num_vuelos; j++) {
+            if (strcmp(listaPasajeros[i].vuelos[j], id_vuelo) == 0) {
+                printf("DNI: %s\n", listaPasajeros[i].dni);
+                printf("Nombre: %s\n", listaPasajeros[i].nombre);
+                printf("Apellido: %s\n", listaPasajeros[i].apellido);
+                printf("Email: %s\n", listaPasajeros[i].email);
+                printf("Telefono: %s\n", listaPasajeros[i].telefono);
+                printf("----------------------------------------\n");
+                encontrados = 1;
+                break;
+            }
+        }
+    }
+
+    if (!encontrados) {
+        printf("No hay pasajeros asignados a este vuelo.\n");
+    }
+}
+
+void accionVerEquipajePorPasajero(void) {
+    mostrarCabecera("VER EQUIPAJE POR PASAJERO");
+    mostrarFuncionNoDisponible("Ver equipaje por pasajero");
+}
+
+/* ================= EQUIPAJE Y OTROS ================= */
 
 void accionRegistrarEquipaje(void) {
     mostrarCabecera("REGISTRAR EQUIPAJE");
@@ -538,26 +739,6 @@ void accionEliminarEquipaje(void) {
 void accionVerEquipaje(void) {
     mostrarCabecera("VER EQUIPAJE");
     mostrarFuncionNoDisponible("Ver equipaje");
-}
-
-void accionAsignarPasajeroAVuelo(void) {
-    mostrarCabecera("ASIGNAR PASAJERO A VUELO");
-    mostrarFuncionNoDisponible("Asignar pasajero a vuelo");
-}
-
-void accionRegistrarEquipajeAPasajero(void) {
-    mostrarCabecera("REGISTRAR EQUIPAJE A PASAJERO");
-    mostrarFuncionNoDisponible("Registrar equipaje a pasajero");
-}
-
-void accionVerPasajerosPorVuelo(void) {
-    mostrarCabecera("VER PASAJEROS POR VUELO");
-    mostrarFuncionNoDisponible("Ver pasajeros por vuelo");
-}
-
-void accionVerEquipajePorPasajero(void) {
-    mostrarCabecera("VER EQUIPAJE POR PASAJERO");
-    mostrarFuncionNoDisponible("Ver equipaje por pasajero");
 }
 
 void accionCrearCliente(void) {
