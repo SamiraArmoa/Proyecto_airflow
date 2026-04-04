@@ -1,0 +1,49 @@
+codigo,nombre,ciudad,pais,num_pistas
+MAD,Adolfo Suarez Madrid-Barajas,Madrid,Espana,4
+BCN,Josep Tarradellas Barcelona-El Prat,Barcelona,Espana,3
+BIO,Aeropuerto de Bilbao,Bilbao,Espana,2
+VLC,Aeropuerto de Valencia,Valencia,Espana,2
+SVQ,Aeropuerto de Sevilla,Sevilla,Espana,2
+AGP,Aeropuerto de Malaga,Malaga,Espana,3
+PMI,Aeropuerto de Palma de Mallorca,Palma,Espana,2
+LPA,Gran Canaria Airport,Las Palmas,Espana,2
+TFN,Tenerife Norte,Tenerife,Espana,2
+SCQ,Aeropuerto de Santiago,Santiago,Espana,2
+LHR,Heathrow Airport,Londres,Reino Unido,4
+LGW,Gatwick Airport,Londres,Reino Unido,3
+CDG,Charles de Gaulle,Paris,Francia,4
+ORY,Orly Airport,Paris,Francia,3
+FCO,Leonardo da Vinci,Roma,Italia,3
+MXP,Malpensa Airport,Milan,Italia,3
+FRA,Frankfurt Airport,Frankfurt,Alemania,4
+MUC,Munich Airport,Munich,Alemania,3
+AMS,Schiphol,Amsterdam,Paises Bajos,3
+LIS,Aeropuerto de Lisboa,Lisboa,Portugal,2
+OPO,Aeropuerto de Oporto,Oporto,Portugal,2
+DUB,Dublin Airport,Dublin,Irlanda,2
+BRU,Brussels Airport,Bruselas,Belgica,2
+VIE,Vienna Airport,Viena,Austria,3
+ZRH,Zurich Airport,Zurich,Suiza,3
+ATH,Athens International,Atenas,Grecia,3
+PRG,Vaclav Havel Airport,Praga,Chequia,2
+WAW,Chopin Airport,Varsovia,Polonia,2
+JFK,John F Kennedy,New York,USA,4
+LAX,Los Angeles Airport,Los Angeles,USA,4
+ORD,O Hare International,Chicago,USA,4
+MIA,Miami International,Miami,USA,4
+MEX,Aeropuerto Ciudad de Mexico,Ciudad de Mexico,Mexico,3
+CUN,Cancun International,Cancun,Mexico,3
+BOG,El Dorado,Bogota,Colombia,3
+LIM,Jorge Chavez,Lima,Peru,3
+GRU,Sao Paulo Airport,Sao Paulo,Brasil,3
+EZE,Buenos Aires Airport,Buenos Aires,Argentina,3
+SCL,Arturo Merino Benitez,Santiago de Chile,Chile,3
+NRT,Narita Airport,Tokio,Japon,4
+HND,Haneda Airport,Tokio,Japon,4
+ICN,Incheon International,Seul,Corea del Sur,4
+PEK,Beijing Capital,Pekin,China,4
+PVG,Shanghai Pudong,Shanghai,China,4
+SIN,Changi Airport,Singapur,Singapur,4
+DXB,Dubai International,Dubai,Emiratos Arabes,4
+DOH,Hamad International,Doha,Qatar,4
+CAI,Cairo International,El Cairo,Egipto,3

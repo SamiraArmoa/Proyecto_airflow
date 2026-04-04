@@ -218,47 +218,32 @@ int leerOpcionMenu(int *opcion) {
 /* ================= ACCIONES CARGA CSV ================= */
 
 void accionCargarCSV(void) {
-    char rutaAeropuertos[256];
-    char rutaVuelos[256];
-    char rutaPasajeros[256];
 
     mostrarCabecera("CARGAR DATOS DESDE CSV");
 
-    printf("Introduce la ruta del CSV de aeropuertos: ");
-    if (leerCadena(rutaAeropuertos, sizeof(rutaAeropuertos)) != 0) {
-        printf("Error al leer la ruta de aeropuertos.\n");
-        return;
-    }
+    char ruta[256];
 
-    if (aeropuerto_cargar_csv(listaAeropuertos, &totalAeropuertos, rutaAeropuertos) < 0) {
-        printf("No se pudieron cargar los aeropuertos.\n");
-    } else {
-        printf("Aeropuertos cargados correctamente.\n");
-    }
+    totalAeropuertos = 0;
+    totalVuelos = 0;
+    totalPasajeros = 0;
 
-    printf("Introduce la ruta del CSV de vuelos: ");
-    if (leerCadena(rutaVuelos, sizeof(rutaVuelos)) != 0) {
-        printf("Error al leer la ruta de vuelos.\n");
-        return;
-    }
+    printf("Ruta aeropuertos: ");
+    leerCadena(ruta,sizeof(ruta));
+    aeropuerto_cargar_csv(listaAeropuertos,&totalAeropuertos,ruta);
 
-    if (vuelo_cargar_csv(listaVuelos, &totalVuelos, rutaVuelos) < 0) {
-        printf("No se pudieron cargar los vuelos.\n");
-    } else {
-        printf("Vuelos cargados correctamente.\n");
-    }
+    printf("Ruta vuelos: ");
+    leerCadena(ruta,sizeof(ruta));
+    vuelo_cargar_csv(listaVuelos,&totalVuelos,ruta);
 
-    printf("Introduce la ruta del CSV de pasajeros: ");
-    if (leerCadena(rutaPasajeros, sizeof(rutaPasajeros)) != 0) {
-        printf("Error al leer la ruta de pasajeros.\n");
-        return;
-    }
+    printf("Ruta pasajeros: ");
+    leerCadena(ruta,sizeof(ruta));
+    pasajero_cargar_csv(listaPasajeros,&totalPasajeros,ruta);
 
-    if (pasajero_cargar_csv(listaPasajeros, &totalPasajeros, rutaPasajeros) < 0) {
-        printf("No se pudieron cargar los pasajeros.\n");
-    } else {
-        printf("Pasajeros cargados correctamente.\n");
-    }
+    printf("\nDATOS CARGADOS:\n");
+    printf("Aeropuertos: %d\n", totalAeropuertos);
+    printf("Vuelos: %d\n", totalVuelos);
+    printf("Pasajeros: %d\n", totalPasajeros);
+
 }
 
 /* ================= ACCIONES AEROPUERTOS ================= */
@@ -632,46 +617,39 @@ void accionVerPasajeros(void) {
 
 /* ================= OPERACIONES ================= */
 
-void accionAsignarPasajeroAVuelo(void) {
+void accionAsignarPasajeroAVuelo(void){
+
     char dni[MAX_DNI];
-    char id_vuelo[MAX_ID_VUELO];
+    char id[MAX_ID_VUELO];
 
     mostrarCabecera("ASIGNAR PASAJERO A VUELO");
 
-    printf("DNI del pasajero: ");
-    if (leerCadena(dni, sizeof(dni)) != 0) {
-        printf("Error al leer el DNI.\n");
+    printf("DNI pasajero: ");
+    leerCadena(dni,sizeof(dni));
+
+    printf("ID vuelo: ");
+    leerCadena(id,sizeof(id));
+
+    if(vuelo_buscar(listaVuelos,totalVuelos,id)==-1){
+
+        printf("El vuelo no existe\n");
         return;
+
     }
 
-    printf("ID del vuelo: ");
-    if (leerCadena(id_vuelo, sizeof(id_vuelo)) != 0) {
-        printf("Error al leer el ID del vuelo.\n");
+    if(vuelo_reservar_asiento(listaVuelos,totalVuelos,id)!=0){
+
+        printf("No hay asientos disponibles\n");
         return;
+
     }
 
-    if (vuelo_buscar(listaVuelos, totalVuelos, id_vuelo) == -1) {
-        printf("El vuelo no existe.\n");
-        return;
+    if(pasajero_asignar_vuelo(listaPasajeros,totalPasajeros,dni,id)==0){
+
+        printf("Pasajero asignado correctamente\n");
+
     }
 
-    if (pasajero_buscar(listaPasajeros, totalPasajeros, dni) == -1) {
-        printf("El pasajero no existe.\n");
-        return;
-    }
-
-    if (vuelo_reservar_asiento(listaVuelos, totalVuelos, id_vuelo) != 0) {
-        printf("No se pudo reservar asiento en el vuelo.\n");
-        return;
-    }
-
-    if (pasajero_asignar_vuelo(listaPasajeros, totalPasajeros, dni, id_vuelo) != 0) {
-        vuelo_liberar_asiento(listaVuelos, totalVuelos, id_vuelo);
-        printf("No se pudo asignar el vuelo al pasajero.\n");
-        return;
-    }
-
-    printf("Pasajero asignado al vuelo correctamente.\n");
 }
 
 void accionRegistrarEquipajeAPasajero(void) {
@@ -760,12 +738,10 @@ void accionActualizarCliente(void) {
 
 int accionSalir(void) {
     mostrarCabecera("SALIR");
-
     if (confirmarAccion("¿Seguro que deseas salir del sistema?")) {
         printf("Saliendo del sistema...\n");
         return 1;
     }
-
     printf("Salida cancelada.\n");
     return 0;
 }

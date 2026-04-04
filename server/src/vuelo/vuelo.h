@@ -8,7 +8,7 @@
 #ifndef SERVER_SRC_VUELO_VUELO_H_
 #define SERVER_SRC_VUELO_VUELO_H_
 
-#define MAX_VUELOS       200
+#define MAX_VUELOS       500
 #define MAX_ID_VUELO     20
 #define MAX_FECHA        20
 #define MAX_HORA         10

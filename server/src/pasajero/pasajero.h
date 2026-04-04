@@ -8,7 +8,7 @@
 #ifndef SERVER_PASAJERO_PASAJERO_H_
 #define SERVER_PASAJERO_PASAJERO_H_
 
-#define MAX_PASAJEROS    500
+#define MAX_PASAJEROS    2000
 #define MAX_DNI          20
 #define MAX_NOMBRE_P     80
 #define MAX_APELLIDO_P   80
