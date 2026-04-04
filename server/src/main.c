@@ -9,6 +9,36 @@
 #define OPCION_MIN 1
 #define OPCION_SALIR 21
 
+/* ================= ROLES ================= */
+
+typedef enum {
+    ROL_ADMINISTRADOR = 1,
+    ROL_PASAJERO,
+    ROL_EMPLEADO,
+    ROL_SALIR_LOGIN
+} RolUsuario;
+
+void mostrarMenuLogin(void) {
+    printf("\n========================================\n");
+    printf("  SISTEMA DE GESTION DE AEROPUERTO\n");
+    printf("========================================\n");
+    printf("1. Administrador\n");
+    printf("2. Pasajero\n");
+    printf("3. Empleado\n");
+    printf("4. Salir\n");
+    printf("\nIdentificate como: ");
+}
+
+int leerRol(int *rol) {
+    if (rol == NULL) return -1;
+    if (leerEntero(rol) != 0) return -1;
+    if (*rol < ROL_ADMINISTRADOR || *rol > ROL_SALIR_LOGIN) {
+        printf("Error: opcion no valida.\n");
+        return -1;
+    }
+    return 0;
+}
+
 typedef enum {
     OPCION_CARGAR_CSV = 1,
 
@@ -851,21 +881,59 @@ int escogerOpcion(int *opcion) {
 /* ================= MAIN ================= */
 
 int main(void) {
+    int rol = 0;
     int opcion = 0;
 
     do {
-        if (leerOpcionMenu(&opcion) != 0) {
+        mostrarMenuLogin();
+
+        if (leerRol(&rol) != 0) {
             pausarPantalla();
             continue;
         }
 
-        escogerOpcion(&opcion);
+        switch (rol) {
 
-        if (opcion != OPCION_SALIR) {
-            pausarPantalla();
+            case ROL_ADMINISTRADOR:
+                do {
+                    if (leerOpcionMenu(&opcion) != 0) {
+                        pausarPantalla();
+                        continue;
+                    }
+
+                    escogerOpcion(&opcion);
+
+                    if (opcion != OPCION_SALIR) {
+                        pausarPantalla();
+                    }
+
+                } while (opcion != OPCION_SALIR);
+
+                /* Al salir del menu admin, volvemos al login */
+                opcion = 0;
+                break;
+
+            case ROL_PASAJERO:
+                printf("\nFuncionalidad de pasajero en construccion.\n");
+                pausarPantalla();
+                break;
+
+            case ROL_EMPLEADO:
+                printf("\nFuncionalidad de empleado en construccion.\n");
+                pausarPantalla();
+                break;
+
+            case ROL_SALIR_LOGIN:
+                printf("\nSaliendo del sistema...\n");
+                break;
+
+            default:
+                printf("Opcion no valida.\n");
+                pausarPantalla();
+                break;
         }
 
-    } while (opcion != OPCION_SALIR);
+    } while (rol != ROL_SALIR_LOGIN);
 
     return 0;
 }
