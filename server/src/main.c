@@ -6,6 +6,7 @@
 #include "vuelo/vuelo.h"
 #include "pasajero/pasajero.h"
 #include "equipaje/equipaje.h"
+#include "config/config.h"
 
 #define OPCION_MIN 1
 #define OPCION_SALIR 21
@@ -25,9 +26,6 @@ void mostrarFuncionNoDisponible(const char *nombreFuncion);
 void mostrarMenu(void);
 int leerOpcionMenu(int *opcion);
 int escogerOpcion(int *opcion);
-
-void mostrarMenuLogin(void);
-int leerRol(int *rol);
 
 void mostrarMenuEmpleado(void);
 int leerOpcionMenuEmpleado(int *opcion);
@@ -67,72 +65,20 @@ void ejecutarMenuPasajero(void);
 void mostrarDatosPasajero(const char *dni);
 void mostrarVuelosPasajero(const char *dni);
 
+int loginSistema(void);
+
 /* ================= ROLES ================= */
 
 typedef enum {
+    ROL_INVALIDO = 0,
     ROL_ADMINISTRADOR = 1,
-    ROL_PASAJERO,
-    ROL_EMPLEADO,
-    ROL_SALIR_LOGIN
+    ROL_EMPLEADO = 2,
+    ROL_PASAJERO = 3
 } RolUsuario;
 
-void mostrarMenuLogin(void) {
-    printf("\n========================================\n");
-    printf("  SISTEMA DE GESTION DE AEROPUERTO\n");
-    printf("========================================\n");
-    printf("1. Administrador\n");
-    printf("2. Pasajero\n");
-    printf("3. Empleado\n");
-    printf("4. Salir\n");
-    printf("\nIdentificate como: ");
-}
+/* ================= CONFIG GLOBAL ================= */
 
-int leerRol(int *rol) {
-    if (rol == NULL) return -1;
-    if (leerEntero(rol) != 0) return -1;
-    if (*rol < ROL_ADMINISTRADOR || *rol > ROL_SALIR_LOGIN) {
-        printf("Error: opcion no valida.\n");
-        return -1;
-    }
-    return 0;
-}
-
-/* ================= OPCIONES ADMIN ================= */
-
-typedef enum {
-    OPCION_CARGAR_CSV = 1,
-
-    /* AEROPUERTOS */
-    OPCION_CREAR_AEROPUERTO,
-    OPCION_ELIMINAR_AEROPUERTO,
-    OPCION_ACTUALIZAR_AEROPUERTO,
-    OPCION_VER_AEROPUERTOS,
-
-    /* VUELOS */
-    OPCION_CREAR_VUELO,
-    OPCION_ELIMINAR_VUELO,
-    OPCION_ACTUALIZAR_VUELO,
-    OPCION_VER_VUELOS,
-
-    /* PASAJEROS */
-    OPCION_CREAR_PASAJERO,
-    OPCION_ELIMINAR_PASAJERO,
-    OPCION_ACTUALIZAR_PASAJERO,
-    OPCION_VER_PASAJEROS,
-
-    /* EQUIPAJE */
-    OPCION_REGISTRAR_EQUIPAJE,
-    OPCION_ELIMINAR_EQUIPAJE,
-    OPCION_VER_EQUIPAJE,
-
-    /* OPERACIONES */
-    OPCION_ASIGNAR_PASAJERO_A_VUELO,
-    OPCION_REGISTRAR_EQUIPAJE_A_PASAJERO,
-    OPCION_VER_PASAJEROS_POR_VUELO,
-    OPCION_VER_EQUIPAJE_POR_PASAJERO,
-
-    OPCION_MENU_SALIR
-} OpcionMenu;
+static Config configSistema;
 
 /* ================= DATOS GLOBALES ================= */
 
@@ -247,6 +193,79 @@ void mostrarFuncionNoDisponible(const char *nombreFuncion) {
         printf("Funcion en construccion.\n");
     }
 }
+
+/* ================= LOGIN ================= */
+
+int loginSistema(void) {
+    char usuario[100];
+    char password[100];
+
+    mostrarCabecera("LOGIN");
+
+    printf("Usuario: ");
+    if (leerCadena(usuario, sizeof(usuario)) != 0) {
+        return ROL_INVALIDO;
+    }
+
+    printf("Password: ");
+    if (leerCadena(password, sizeof(password)) != 0) {
+        return ROL_INVALIDO;
+    }
+
+    if (strcmp(usuario, configSistema.admin_user) == 0 &&
+        strcmp(password, configSistema.admin_pass) == 0) {
+        return ROL_ADMINISTRADOR;
+    }
+
+    if (strcmp(usuario, configSistema.empleado_user) == 0 &&
+        strcmp(password, configSistema.empleado_pass) == 0) {
+        return ROL_EMPLEADO;
+    }
+
+    if (strcmp(usuario, configSistema.pasajero_user) == 0 &&
+        strcmp(password, configSistema.pasajero_pass) == 0) {
+        return ROL_PASAJERO;
+    }
+
+    return ROL_INVALIDO;
+}
+
+/* ================= OPCIONES ADMIN ================= */
+
+typedef enum {
+    OPCION_CARGAR_CSV = 1,
+
+    /* AEROPUERTOS */
+    OPCION_CREAR_AEROPUERTO,
+    OPCION_ELIMINAR_AEROPUERTO,
+    OPCION_ACTUALIZAR_AEROPUERTO,
+    OPCION_VER_AEROPUERTOS,
+
+    /* VUELOS */
+    OPCION_CREAR_VUELO,
+    OPCION_ELIMINAR_VUELO,
+    OPCION_ACTUALIZAR_VUELO,
+    OPCION_VER_VUELOS,
+
+    /* PASAJEROS */
+    OPCION_CREAR_PASAJERO,
+    OPCION_ELIMINAR_PASAJERO,
+    OPCION_ACTUALIZAR_PASAJERO,
+    OPCION_VER_PASAJEROS,
+
+    /* EQUIPAJE */
+    OPCION_REGISTRAR_EQUIPAJE,
+    OPCION_ELIMINAR_EQUIPAJE,
+    OPCION_VER_EQUIPAJE,
+
+    /* OPERACIONES */
+    OPCION_ASIGNAR_PASAJERO_A_VUELO,
+    OPCION_REGISTRAR_EQUIPAJE_A_PASAJERO,
+    OPCION_VER_PASAJEROS_POR_VUELO,
+    OPCION_VER_EQUIPAJE_POR_PASAJERO,
+
+    OPCION_MENU_SALIR
+} OpcionMenu;
 
 /* ================= MENU ADMIN ================= */
 
@@ -363,28 +382,15 @@ int leerOpcionMenuPasajero(int *opcion) {
 void accionCargarCSV(void) {
     mostrarCabecera("CARGAR DATOS DESDE CSV");
 
-    char ruta[256];
-
     totalAeropuertos = 0;
     totalVuelos = 0;
     totalPasajeros = 0;
     totalEquipaje = 0;
 
-    printf("Ruta aeropuertos: ");
-    if (leerCadena(ruta, sizeof(ruta)) != 0) return;
-    aeropuerto_cargar_csv(listaAeropuertos, &totalAeropuertos, ruta);
-
-    printf("Ruta vuelos: ");
-    if (leerCadena(ruta, sizeof(ruta)) != 0) return;
-    vuelo_cargar_csv(listaVuelos, &totalVuelos, ruta);
-
-    printf("Ruta pasajeros: ");
-    if (leerCadena(ruta, sizeof(ruta)) != 0) return;
-    pasajero_cargar_csv(listaPasajeros, &totalPasajeros, ruta);
-
-    printf("Ruta equipajes: ");
-    if (leerCadena(ruta, sizeof(ruta)) != 0) return;
-    equipaje_cargar_csv(listaEquipaje, &totalEquipaje, ruta);
+    aeropuerto_cargar_csv(listaAeropuertos, &totalAeropuertos, configSistema.ruta_aeropuertos);
+    vuelo_cargar_csv(listaVuelos, &totalVuelos, configSistema.ruta_vuelos);
+    pasajero_cargar_csv(listaPasajeros, &totalPasajeros, configSistema.ruta_pasajeros);
+    equipaje_cargar_csv(listaEquipaje, &totalEquipaje, configSistema.ruta_equipajes);
 
     printf("\nDATOS CARGADOS:\n");
     printf("Aeropuertos: %d\n", totalAeropuertos);
@@ -1080,10 +1086,16 @@ int main(void) {
     int rol = 0;
     int opcion = 0;
 
-    do {
-        mostrarMenuLogin();
+    if (cargarConfig("config.txt", &configSistema) != 0) {
+        printf("Error: no se pudo cargar config.txt\n");
+        return 1;
+    }
 
-        if (leerRol(&rol) != 0) {
+    do {
+        rol = loginSistema();
+
+        if (rol == ROL_INVALIDO) {
+            printf("Credenciales incorrectas.\n");
             pausarPantalla();
             continue;
         }
@@ -1115,17 +1127,14 @@ int main(void) {
                 ejecutarMenuEmpleado();
                 break;
 
-            case ROL_SALIR_LOGIN:
-                printf("\nSaliendo del sistema...\n");
-                break;
-
             default:
-                printf("Opcion no valida.\n");
+                printf("Rol no valido.\n");
                 pausarPantalla();
                 break;
         }
 
-    } while (rol != ROL_SALIR_LOGIN);
+    } while (!confirmarAccion("¿Deseas cerrar completamente la aplicacion?"));
 
+    printf("Saliendo del sistema...\n");
     return 0;
 }

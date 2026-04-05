@@ -1,0 +1,13 @@
+admin_user=admin
+admin_pass=1234
+
+empleado_user=empleado
+empleado_pass=abcd
+
+pasajero_user=pasajero
+pasajero_pass=1111
+
+ruta_aeropuertos=aeropuertos_grandes.csv
+ruta_vuelos=vuelos_grandes.csv
+ruta_pasajeros=pasajeros_grandes.csv
+ruta_equipajes=equipajes_grandes.csv
