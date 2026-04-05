@@ -11,7 +11,7 @@
 #define OPCION_MIN 1
 #define OPCION_SALIR 21
 
-/* ================= PROTOTIPOS ================= */
+// PROTOTIPOS
 
 void limpiarBufferEntrada(void);
 int leerEntero(int *valor);
@@ -67,7 +67,7 @@ void mostrarVuelosPasajero(const char *dni);
 
 int loginSistema(void);
 
-/* ================= ROLES ================= */
+//ROLES
 
 typedef enum {
     ROL_INVALIDO = 0,
@@ -76,11 +76,11 @@ typedef enum {
     ROL_PASAJERO = 3
 } RolUsuario;
 
-/* ================= CONFIG GLOBAL ================= */
+//CONFIG GLOBAL
 
 static Config configSistema;
 
-/* ================= DATOS GLOBALES ================= */
+//DATOS GLOBALES
 
 static Aeropuerto listaAeropuertos[MAX_AEROPUERTOS];
 static int totalAeropuertos = 0;
@@ -94,7 +94,7 @@ static int totalPasajeros = 0;
 static Equipaje listaEquipaje[MAX_EQUIPAJES];
 static int totalEquipaje = 0;
 
-/* ================= FUNCIONES AUXILIARES ================= */
+//FUNCIONES AUXILIARES
 
 void limpiarBufferEntrada(void) {
     int c;
@@ -230,7 +230,7 @@ int loginSistema(void) {
     return ROL_INVALIDO;
 }
 
-/* ================= OPCIONES ADMIN ================= */
+//OPCIONES ADMIN
 
 typedef enum {
     OPCION_CARGAR_CSV = 1,
@@ -267,7 +267,7 @@ typedef enum {
     OPCION_MENU_SALIR
 } OpcionMenu;
 
-/* ================= MENU ADMIN ================= */
+//MENU ADMIN
 
 void mostrarMenu(void) {
     mostrarCabecera("MENU ADMINISTRADOR");
@@ -326,7 +326,7 @@ int leerOpcionMenu(int *opcion) {
     return 0;
 }
 
-/* ================= MENU EMPLEADO ================= */
+// MENU EMPLEADO
 
 void mostrarMenuEmpleado(void) {
     mostrarCabecera("MENU EMPLEADO");
@@ -353,7 +353,7 @@ int leerOpcionMenuEmpleado(int *opcion) {
     return 0;
 }
 
-/* ================= MENU PASAJERO ================= */
+// MENU PASAJERO
 
 void mostrarMenuPasajero(void) {
     mostrarCabecera("MENU PASAJERO");
@@ -377,7 +377,7 @@ int leerOpcionMenuPasajero(int *opcion) {
     return 0;
 }
 
-/* ================= ACCIONES CARGA CSV ================= */
+//ACCIONES CARGA CSV
 
 void accionCargarCSV(void) {
     mostrarCabecera("CARGAR DATOS DESDE CSV");
@@ -399,7 +399,7 @@ void accionCargarCSV(void) {
     printf("Equipajes: %d\n", totalEquipaje);
 }
 
-/* ================= ACCIONES AEROPUERTOS ================= */
+//ACCIONES AEROPUERTOS
 
 void accionCrearAeropuerto(void) {
     char codigo[MAX_CODIGO];
@@ -491,7 +491,7 @@ void accionVerAeropuertos(void) {
     aeropuerto_ver(listaAeropuertos, totalAeropuertos);
 }
 
-/* ================= ACCIONES VUELOS ================= */
+//ACCIONES VUELOS
 
 void accionCrearVuelo(void) {
     char id[MAX_ID_VUELO];
@@ -590,7 +590,7 @@ void accionVerVuelos(void) {
     vuelo_ver(listaVuelos, totalVuelos);
 }
 
-/* ================= ACCIONES PASAJEROS ================= */
+//ACCIONES PASAJEROS
 
 void accionCrearPasajero(void) {
     char dni[MAX_DNI];
@@ -671,7 +671,7 @@ void accionVerPasajeros(void) {
     pasajero_ver(listaPasajeros, totalPasajeros);
 }
 
-/* ================= OPERACIONES ================= */
+//OPERACIONES
 
 void accionAsignarPasajeroAVuelo(void) {
     char dni[MAX_DNI];
@@ -785,8 +785,7 @@ void accionVerEquipajePorPasajero(void) {
 
     equipaje_ver_por_pasajero(listaEquipaje, totalEquipaje, dni);
 }
-
-/* ================= EQUIPAJE ================= */
+// EQUIPAJE
 
 void accionRegistrarEquipaje(void) {
     char id_eq[MAX_ID_EQ];
@@ -862,7 +861,7 @@ int accionSalir(void) {
     return 0;
 }
 
-/* ================= CONTROLADOR ADMIN ================= */
+//CONTROLADOR ADMIN
 
 int escogerOpcion(int *opcion) {
     if (opcion == NULL) {
@@ -943,7 +942,7 @@ int escogerOpcion(int *opcion) {
     return 0;
 }
 
-/* ================= MENU EMPLEADO ================= */
+//MENU EMPLEADO
 
 void ejecutarMenuEmpleado(void) {
     int opcion = 0;
@@ -991,7 +990,7 @@ void ejecutarMenuEmpleado(void) {
     } while (opcion != 8);
 }
 
-/* ================= MENU PASAJERO ================= */
+// MENU PASAJERO
 
 void mostrarDatosPasajero(const char *dni) {
     int idx = pasajero_buscar(listaPasajeros, totalPasajeros, dni);
@@ -1080,7 +1079,7 @@ void ejecutarMenuPasajero(void) {
     } while (opcion != 5);
 }
 
-/* ================= MAIN ================= */
+// MAIN
 
 int main(void) {
     int rol = 0;
