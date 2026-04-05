@@ -8,7 +8,7 @@
 #ifndef SERVER_SRC_EQUIPAJE_EQUIPAJE_H_
 #define SERVER_SRC_EQUIPAJE_EQUIPAJE_H_
 
-#define MAX_EQUIPAJES     1000
+#define MAX_EQUIPAJES     3000
 #define MAX_ID_EQ         20
 #define MAX_TIPO_EQ       30   // "maleta", "mochila", "bulto", ...
 

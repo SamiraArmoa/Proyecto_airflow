@@ -10,6 +10,63 @@
 #define OPCION_MIN 1
 #define OPCION_SALIR 21
 
+/* ================= PROTOTIPOS ================= */
+
+void limpiarBufferEntrada(void);
+int leerEntero(int *valor);
+int leerCaracter(char *caracter);
+int leerCadena(char *buffer, int tam);
+void pausarPantalla(void);
+int confirmarAccion(const char *mensaje);
+int opcionValida(int opcion);
+void mostrarCabecera(const char *titulo);
+void mostrarFuncionNoDisponible(const char *nombreFuncion);
+
+void mostrarMenu(void);
+int leerOpcionMenu(int *opcion);
+int escogerOpcion(int *opcion);
+
+void mostrarMenuLogin(void);
+int leerRol(int *rol);
+
+void mostrarMenuEmpleado(void);
+int leerOpcionMenuEmpleado(int *opcion);
+
+void mostrarMenuPasajero(void);
+int leerOpcionMenuPasajero(int *opcion);
+
+void accionCargarCSV(void);
+void accionCrearAeropuerto(void);
+void accionEliminarAeropuerto(void);
+void accionActualizarAeropuerto(void);
+void accionVerAeropuertos(void);
+
+void accionCrearVuelo(void);
+void accionEliminarVuelo(void);
+void accionActualizarVuelo(void);
+void accionVerVuelos(void);
+
+void accionCrearPasajero(void);
+void accionEliminarPasajero(void);
+void accionActualizarPasajero(void);
+void accionVerPasajeros(void);
+
+void accionRegistrarEquipaje(void);
+void accionEliminarEquipaje(void);
+void accionVerEquipaje(void);
+
+void accionAsignarPasajeroAVuelo(void);
+void accionRegistrarEquipajeAPasajero(void);
+void accionVerPasajerosPorVuelo(void);
+void accionVerEquipajePorPasajero(void);
+
+int accionSalir(void);
+
+void ejecutarMenuEmpleado(void);
+void ejecutarMenuPasajero(void);
+void mostrarDatosPasajero(const char *dni);
+void mostrarVuelosPasajero(const char *dni);
+
 /* ================= ROLES ================= */
 
 typedef enum {
@@ -39,6 +96,8 @@ int leerRol(int *rol) {
     }
     return 0;
 }
+
+/* ================= OPCIONES ADMIN ================= */
 
 typedef enum {
     OPCION_CARGAR_CSV = 1,
@@ -88,12 +147,12 @@ static int totalPasajeros = 0;
 
 static Equipaje listaEquipaje[MAX_EQUIPAJES];
 static int totalEquipaje = 0;
+
 /* ================= FUNCIONES AUXILIARES ================= */
 
 void limpiarBufferEntrada(void) {
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {
-        /* limpiar buffer */
     }
 }
 
@@ -189,12 +248,12 @@ void mostrarFuncionNoDisponible(const char *nombreFuncion) {
     }
 }
 
-/* ================= MENU ================= */
+/* ================= MENU ADMIN ================= */
 
 void mostrarMenu(void) {
     mostrarCabecera("MENU ADMINISTRADOR");
 
-    printf("1. Cargar aeropuertos, vuelos y pasajeros desde .csv\n");
+    printf("1. Cargar aeropuertos, vuelos, pasajeros y equipajes desde .csv\n");
 
     printf("--- AEROPUERTOS ---\n");
     printf("2.  Crear aeropuertos\n");
@@ -248,10 +307,60 @@ int leerOpcionMenu(int *opcion) {
     return 0;
 }
 
+/* ================= MENU EMPLEADO ================= */
+
+void mostrarMenuEmpleado(void) {
+    mostrarCabecera("MENU EMPLEADO");
+
+    printf("1. Ver aeropuertos\n");
+    printf("2. Ver vuelos\n");
+    printf("3. Ver pasajeros\n");
+    printf("4. Ver equipaje\n");
+    printf("5. Asignar pasajero a vuelo\n");
+    printf("6. Ver pasajeros por vuelo\n");
+    printf("7. Ver equipaje por pasajero\n");
+    printf("8. Salir\n");
+}
+
+int leerOpcionMenuEmpleado(int *opcion) {
+    if (opcion == NULL) return -1;
+    mostrarMenuEmpleado();
+    printf("\nElige una opcion: ");
+    if (leerEntero(opcion) != 0) return -1;
+    if (*opcion < 1 || *opcion > 8) {
+        printf("Error: opcion no valida.\n");
+        return -1;
+    }
+    return 0;
+}
+
+/* ================= MENU PASAJERO ================= */
+
+void mostrarMenuPasajero(void) {
+    mostrarCabecera("MENU PASAJERO");
+
+    printf("1. Ver mis datos\n");
+    printf("2. Ver vuelos disponibles\n");
+    printf("3. Ver mis vuelos\n");
+    printf("4. Ver mi equipaje\n");
+    printf("5. Salir\n");
+}
+
+int leerOpcionMenuPasajero(int *opcion) {
+    if (opcion == NULL) return -1;
+    mostrarMenuPasajero();
+    printf("\nElige una opcion: ");
+    if (leerEntero(opcion) != 0) return -1;
+    if (*opcion < 1 || *opcion > 5) {
+        printf("Error: opcion no valida.\n");
+        return -1;
+    }
+    return 0;
+}
+
 /* ================= ACCIONES CARGA CSV ================= */
 
 void accionCargarCSV(void) {
-
     mostrarCabecera("CARGAR DATOS DESDE CSV");
 
     char ruta[256];
@@ -259,24 +368,29 @@ void accionCargarCSV(void) {
     totalAeropuertos = 0;
     totalVuelos = 0;
     totalPasajeros = 0;
+    totalEquipaje = 0;
 
     printf("Ruta aeropuertos: ");
-    leerCadena(ruta,sizeof(ruta));
-    aeropuerto_cargar_csv(listaAeropuertos,&totalAeropuertos,ruta);
+    if (leerCadena(ruta, sizeof(ruta)) != 0) return;
+    aeropuerto_cargar_csv(listaAeropuertos, &totalAeropuertos, ruta);
 
     printf("Ruta vuelos: ");
-    leerCadena(ruta,sizeof(ruta));
-    vuelo_cargar_csv(listaVuelos,&totalVuelos,ruta);
+    if (leerCadena(ruta, sizeof(ruta)) != 0) return;
+    vuelo_cargar_csv(listaVuelos, &totalVuelos, ruta);
 
     printf("Ruta pasajeros: ");
-    leerCadena(ruta,sizeof(ruta));
-    pasajero_cargar_csv(listaPasajeros,&totalPasajeros,ruta);
+    if (leerCadena(ruta, sizeof(ruta)) != 0) return;
+    pasajero_cargar_csv(listaPasajeros, &totalPasajeros, ruta);
+
+    printf("Ruta equipajes: ");
+    if (leerCadena(ruta, sizeof(ruta)) != 0) return;
+    equipaje_cargar_csv(listaEquipaje, &totalEquipaje, ruta);
 
     printf("\nDATOS CARGADOS:\n");
     printf("Aeropuertos: %d\n", totalAeropuertos);
     printf("Vuelos: %d\n", totalVuelos);
     printf("Pasajeros: %d\n", totalPasajeros);
-
+    printf("Equipajes: %d\n", totalEquipaje);
 }
 
 /* ================= ACCIONES AEROPUERTOS ================= */
@@ -291,33 +405,19 @@ void accionCrearAeropuerto(void) {
     mostrarCabecera("CREAR AEROPUERTO");
 
     printf("Codigo: ");
-    if (leerCadena(codigo, sizeof(codigo)) != 0) {
-        printf("Error al leer el codigo.\n");
-        return;
-    }
+    if (leerCadena(codigo, sizeof(codigo)) != 0) return;
 
     printf("Nombre: ");
-    if (leerCadena(nombre, sizeof(nombre)) != 0) {
-        printf("Error al leer el nombre.\n");
-        return;
-    }
+    if (leerCadena(nombre, sizeof(nombre)) != 0) return;
 
     printf("Ciudad: ");
-    if (leerCadena(ciudad, sizeof(ciudad)) != 0) {
-        printf("Error al leer la ciudad.\n");
-        return;
-    }
+    if (leerCadena(ciudad, sizeof(ciudad)) != 0) return;
 
     printf("Pais: ");
-    if (leerCadena(pais, sizeof(pais)) != 0) {
-        printf("Error al leer el pais.\n");
-        return;
-    }
+    if (leerCadena(pais, sizeof(pais)) != 0) return;
 
     printf("Numero de pistas: ");
-    if (leerEntero(&num_pistas) != 0) {
-        return;
-    }
+    if (leerEntero(&num_pistas) != 0) return;
 
     if (aeropuerto_crear(listaAeropuertos, &totalAeropuertos,
                          codigo, nombre, ciudad, pais, num_pistas) == 0) {
@@ -333,10 +433,7 @@ void accionEliminarAeropuerto(void) {
     mostrarCabecera("ELIMINAR AEROPUERTO");
 
     printf("Codigo del aeropuerto a eliminar: ");
-    if (leerCadena(codigo, sizeof(codigo)) != 0) {
-        printf("Error al leer el codigo.\n");
-        return;
-    }
+    if (leerCadena(codigo, sizeof(codigo)) != 0) return;
 
     if (!confirmarAccion("¿Seguro que deseas eliminar este aeropuerto?")) {
         printf("Operacion cancelada.\n");
@@ -360,33 +457,19 @@ void accionActualizarAeropuerto(void) {
     mostrarCabecera("ACTUALIZAR AEROPUERTO");
 
     printf("Codigo del aeropuerto a actualizar: ");
-    if (leerCadena(codigo, sizeof(codigo)) != 0) {
-        printf("Error al leer el codigo.\n");
-        return;
-    }
+    if (leerCadena(codigo, sizeof(codigo)) != 0) return;
 
     printf("Nuevo nombre (ENTER para no cambiar): ");
-    if (leerCadena(nuevo_nombre, sizeof(nuevo_nombre)) != 0) {
-        printf("Error al leer el nombre.\n");
-        return;
-    }
+    if (leerCadena(nuevo_nombre, sizeof(nuevo_nombre)) != 0) return;
 
     printf("Nueva ciudad (ENTER para no cambiar): ");
-    if (leerCadena(nueva_ciudad, sizeof(nueva_ciudad)) != 0) {
-        printf("Error al leer la ciudad.\n");
-        return;
-    }
+    if (leerCadena(nueva_ciudad, sizeof(nueva_ciudad)) != 0) return;
 
     printf("Nuevo pais (ENTER para no cambiar): ");
-    if (leerCadena(nuevo_pais, sizeof(nuevo_pais)) != 0) {
-        printf("Error al leer el pais.\n");
-        return;
-    }
+    if (leerCadena(nuevo_pais, sizeof(nuevo_pais)) != 0) return;
 
     printf("Nuevo numero de pistas (0 para no cambiar): ");
-    if (leerEntero(&nuevo_num_pistas) != 0) {
-        return;
-    }
+    if (leerEntero(&nuevo_num_pistas) != 0) return;
 
     if (aeropuerto_actualizar(listaAeropuertos, totalAeropuertos,
                               codigo, nuevo_nombre, nueva_ciudad,
@@ -417,52 +500,28 @@ void accionCrearVuelo(void) {
     mostrarCabecera("CREAR VUELO");
 
     printf("ID del vuelo: ");
-    if (leerCadena(id, sizeof(id)) != 0) {
-        printf("Error al leer el ID del vuelo.\n");
-        return;
-    }
+    if (leerCadena(id, sizeof(id)) != 0) return;
 
     printf("Aerolínea: ");
-    if (leerCadena(aerolinea, sizeof(aerolinea)) != 0) {
-        printf("Error al leer la aerolinea.\n");
-        return;
-    }
+    if (leerCadena(aerolinea, sizeof(aerolinea)) != 0) return;
 
     printf("Origen: ");
-    if (leerCadena(origen, sizeof(origen)) != 0) {
-        printf("Error al leer el origen.\n");
-        return;
-    }
+    if (leerCadena(origen, sizeof(origen)) != 0) return;
 
     printf("Destino: ");
-    if (leerCadena(destino, sizeof(destino)) != 0) {
-        printf("Error al leer el destino.\n");
-        return;
-    }
+    if (leerCadena(destino, sizeof(destino)) != 0) return;
 
     printf("Fecha: ");
-    if (leerCadena(fecha, sizeof(fecha)) != 0) {
-        printf("Error al leer la fecha.\n");
-        return;
-    }
+    if (leerCadena(fecha, sizeof(fecha)) != 0) return;
 
     printf("Hora de salida: ");
-    if (leerCadena(hora_salida, sizeof(hora_salida)) != 0) {
-        printf("Error al leer la hora de salida.\n");
-        return;
-    }
+    if (leerCadena(hora_salida, sizeof(hora_salida)) != 0) return;
 
     printf("Hora de llegada: ");
-    if (leerCadena(hora_llegada, sizeof(hora_llegada)) != 0) {
-        printf("Error al leer la hora de llegada.\n");
-        return;
-    }
+    if (leerCadena(hora_llegada, sizeof(hora_llegada)) != 0) return;
 
     printf("Capacidad: ");
-    if (leerEntero(&capacidad) != 0) {
-        printf("Capacidad no valida.\n");
-        return;
-    }
+    if (leerEntero(&capacidad) != 0) return;
 
     if (vuelo_crear(listaVuelos, &totalVuelos, id, aerolinea, origen, destino,
                     fecha, hora_salida, hora_llegada, capacidad) == 0) {
@@ -478,10 +537,7 @@ void accionEliminarVuelo(void) {
     mostrarCabecera("ELIMINAR VUELO");
 
     printf("ID del vuelo a eliminar: ");
-    if (leerCadena(id, sizeof(id)) != 0) {
-        printf("Error al leer el ID.\n");
-        return;
-    }
+    if (leerCadena(id, sizeof(id)) != 0) return;
 
     if (!confirmarAccion("¿Seguro que deseas eliminar este vuelo?")) {
         printf("Operacion cancelada.\n");
@@ -504,28 +560,16 @@ void accionActualizarVuelo(void) {
     mostrarCabecera("ACTUALIZAR VUELO");
 
     printf("ID del vuelo a actualizar: ");
-    if (leerCadena(id, sizeof(id)) != 0) {
-        printf("Error al leer el ID.\n");
-        return;
-    }
+    if (leerCadena(id, sizeof(id)) != 0) return;
 
     printf("Nueva hora de salida (ENTER para no cambiar): ");
-    if (leerCadena(nueva_hora_salida, sizeof(nueva_hora_salida)) != 0) {
-        printf("Error al leer la hora de salida.\n");
-        return;
-    }
+    if (leerCadena(nueva_hora_salida, sizeof(nueva_hora_salida)) != 0) return;
 
     printf("Nueva hora de llegada (ENTER para no cambiar): ");
-    if (leerCadena(nueva_hora_llegada, sizeof(nueva_hora_llegada)) != 0) {
-        printf("Error al leer la hora de llegada.\n");
-        return;
-    }
+    if (leerCadena(nueva_hora_llegada, sizeof(nueva_hora_llegada)) != 0) return;
 
     printf("Nueva capacidad (0 para no cambiar): ");
-    if (leerEntero(&nueva_capacidad) != 0) {
-        printf("Capacidad no valida.\n");
-        return;
-    }
+    if (leerEntero(&nueva_capacidad) != 0) return;
 
     if (vuelo_actualizar(listaVuelos, totalVuelos, id,
                          nueva_hora_salida, nueva_hora_llegada, nueva_capacidad) == 0) {
@@ -552,34 +596,19 @@ void accionCrearPasajero(void) {
     mostrarCabecera("CREAR PASAJERO");
 
     printf("DNI: ");
-    if (leerCadena(dni, sizeof(dni)) != 0) {
-        printf("Error al leer el DNI.\n");
-        return;
-    }
+    if (leerCadena(dni, sizeof(dni)) != 0) return;
 
     printf("Nombre: ");
-    if (leerCadena(nombre, sizeof(nombre)) != 0) {
-        printf("Error al leer el nombre.\n");
-        return;
-    }
+    if (leerCadena(nombre, sizeof(nombre)) != 0) return;
 
     printf("Apellido: ");
-    if (leerCadena(apellido, sizeof(apellido)) != 0) {
-        printf("Error al leer el apellido.\n");
-        return;
-    }
+    if (leerCadena(apellido, sizeof(apellido)) != 0) return;
 
     printf("Email: ");
-    if (leerCadena(email, sizeof(email)) != 0) {
-        printf("Error al leer el email.\n");
-        return;
-    }
+    if (leerCadena(email, sizeof(email)) != 0) return;
 
     printf("Telefono: ");
-    if (leerCadena(telefono, sizeof(telefono)) != 0) {
-        printf("Error al leer el telefono.\n");
-        return;
-    }
+    if (leerCadena(telefono, sizeof(telefono)) != 0) return;
 
     if (pasajero_crear(listaPasajeros, &totalPasajeros, dni, nombre, apellido, email, telefono) == 0) {
         printf("Pasajero creado correctamente.\n");
@@ -594,10 +623,7 @@ void accionEliminarPasajero(void) {
     mostrarCabecera("ELIMINAR PASAJERO");
 
     printf("DNI del pasajero a eliminar: ");
-    if (leerCadena(dni, sizeof(dni)) != 0) {
-        printf("Error al leer el DNI.\n");
-        return;
-    }
+    if (leerCadena(dni, sizeof(dni)) != 0) return;
 
     if (!confirmarAccion("¿Seguro que deseas eliminar este pasajero?")) {
         printf("Operacion cancelada.\n");
@@ -619,22 +645,13 @@ void accionActualizarPasajero(void) {
     mostrarCabecera("ACTUALIZAR PASAJERO");
 
     printf("DNI del pasajero a actualizar: ");
-    if (leerCadena(dni, sizeof(dni)) != 0) {
-        printf("Error al leer el DNI.\n");
-        return;
-    }
+    if (leerCadena(dni, sizeof(dni)) != 0) return;
 
     printf("Nuevo email (ENTER para no cambiar): ");
-    if (leerCadena(nuevo_email, sizeof(nuevo_email)) != 0) {
-        printf("Error al leer el email.\n");
-        return;
-    }
+    if (leerCadena(nuevo_email, sizeof(nuevo_email)) != 0) return;
 
     printf("Nuevo telefono (ENTER para no cambiar): ");
-    if (leerCadena(nuevo_telefono, sizeof(nuevo_telefono)) != 0) {
-        printf("Error al leer el telefono.\n");
-        return;
-    }
+    if (leerCadena(nuevo_telefono, sizeof(nuevo_telefono)) != 0) return;
 
     if (pasajero_actualizar(listaPasajeros, totalPasajeros, dni, nuevo_email, nuevo_telefono) == 0) {
         printf("Pasajero actualizado correctamente.\n");
@@ -650,39 +667,39 @@ void accionVerPasajeros(void) {
 
 /* ================= OPERACIONES ================= */
 
-void accionAsignarPasajeroAVuelo(void){
-
+void accionAsignarPasajeroAVuelo(void) {
     char dni[MAX_DNI];
     char id[MAX_ID_VUELO];
 
     mostrarCabecera("ASIGNAR PASAJERO A VUELO");
 
     printf("DNI pasajero: ");
-    leerCadena(dni,sizeof(dni));
+    if (leerCadena(dni, sizeof(dni)) != 0) return;
 
     printf("ID vuelo: ");
-    leerCadena(id,sizeof(id));
+    if (leerCadena(id, sizeof(id)) != 0) return;
 
-    if(vuelo_buscar(listaVuelos,totalVuelos,id)==-1){
-
+    if (vuelo_buscar(listaVuelos, totalVuelos, id) == -1) {
         printf("El vuelo no existe\n");
         return;
-
     }
 
-    if(vuelo_reservar_asiento(listaVuelos,totalVuelos,id)!=0){
+    if (pasajero_buscar(listaPasajeros, totalPasajeros, dni) == -1) {
+        printf("El pasajero no existe\n");
+        return;
+    }
 
+    if (vuelo_reservar_asiento(listaVuelos, totalVuelos, id) != 0) {
         printf("No hay asientos disponibles\n");
         return;
-
     }
 
-    if(pasajero_asignar_vuelo(listaPasajeros,totalPasajeros,dni,id)==0){
-
+    if (pasajero_asignar_vuelo(listaPasajeros, totalPasajeros, dni, id) == 0) {
         printf("Pasajero asignado correctamente\n");
-
+    } else {
+        vuelo_liberar_asiento(listaVuelos, totalVuelos, id);
+        printf("No se pudo asignar el pasajero al vuelo\n");
     }
-
 }
 
 void accionRegistrarEquipajeAPasajero(void) {
@@ -707,9 +724,7 @@ void accionRegistrarEquipajeAPasajero(void) {
         return;
     }
 
-    printf("Equipaje '%s' ya esta asociado al pasajero '%s' por su DNI.\n",
-           id_eq, dni);
-    printf("Puedes verlo con la opcion 20.\n");
+    printf("Equipaje '%s' asociado al pasajero '%s'.\n", id_eq, dni);
 }
 
 void accionVerPasajerosPorVuelo(void) {
@@ -720,10 +735,7 @@ void accionVerPasajerosPorVuelo(void) {
     mostrarCabecera("VER PASAJEROS POR VUELO");
 
     printf("ID del vuelo: ");
-    if (leerCadena(id_vuelo, sizeof(id_vuelo)) != 0) {
-        printf("Error al leer el ID del vuelo.\n");
-        return;
-    }
+    if (leerCadena(id_vuelo, sizeof(id_vuelo)) != 0) return;
 
     if (vuelo_buscar(listaVuelos, totalVuelos, id_vuelo) == -1) {
         printf("El vuelo no existe.\n");
@@ -768,7 +780,7 @@ void accionVerEquipajePorPasajero(void) {
     equipaje_ver_por_pasajero(listaEquipaje, totalEquipaje, dni);
 }
 
-/* ================= EQUIPAJE Y OTROS ================= */
+/* ================= EQUIPAJE ================= */
 
 void accionRegistrarEquipaje(void) {
     char id_eq[MAX_ID_EQ];
@@ -786,7 +798,6 @@ void accionRegistrarEquipaje(void) {
     printf("DNI pasajero: ");
     if (leerCadena(dni, sizeof(dni)) != 0) return;
 
-    /* verificar que el pasajero existe */
     if (pasajero_buscar(listaPasajeros, totalPasajeros, dni) == -1) {
         printf("El pasajero no existe.\n");
         return;
@@ -835,23 +846,6 @@ void accionVerEquipaje(void) {
     equipaje_ver(listaEquipaje, totalEquipaje);
 }
 
-void accionCrearCliente(void) {
-    mostrarCabecera("CREAR CLIENTE");
-    printf("Iniciando creacion de cliente...\n");
-    crearUsuario();
-}
-
-void accionEliminarCliente(void) {
-    mostrarCabecera("ELIMINAR CLIENTE");
-    printf("Iniciando eliminacion de cliente...\n");
-    eliminarUsuario();
-}
-
-void accionActualizarCliente(void) {
-    mostrarCabecera("ACTUALIZAR CLIENTE");
-    mostrarFuncionNoDisponible("Actualizar cliente");
-}
-
 int accionSalir(void) {
     mostrarCabecera("SALIR");
     if (confirmarAccion("¿Seguro que deseas salir del sistema?")) {
@@ -862,7 +856,7 @@ int accionSalir(void) {
     return 0;
 }
 
-/* ================= CONTROLADOR ================= */
+/* ================= CONTROLADOR ADMIN ================= */
 
 int escogerOpcion(int *opcion) {
     if (opcion == NULL) {
@@ -873,95 +867,211 @@ int escogerOpcion(int *opcion) {
         case OPCION_CARGAR_CSV:
             accionCargarCSV();
             break;
-
         case OPCION_CREAR_AEROPUERTO:
             accionCrearAeropuerto();
             break;
-
         case OPCION_ELIMINAR_AEROPUERTO:
             accionEliminarAeropuerto();
             break;
-
         case OPCION_ACTUALIZAR_AEROPUERTO:
             accionActualizarAeropuerto();
             break;
-
         case OPCION_VER_AEROPUERTOS:
             accionVerAeropuertos();
             break;
-
         case OPCION_CREAR_VUELO:
             accionCrearVuelo();
             break;
-
         case OPCION_ELIMINAR_VUELO:
             accionEliminarVuelo();
             break;
-
         case OPCION_ACTUALIZAR_VUELO:
             accionActualizarVuelo();
             break;
-
         case OPCION_VER_VUELOS:
             accionVerVuelos();
             break;
-
         case OPCION_CREAR_PASAJERO:
             accionCrearPasajero();
             break;
-
         case OPCION_ELIMINAR_PASAJERO:
             accionEliminarPasajero();
             break;
-
         case OPCION_ACTUALIZAR_PASAJERO:
             accionActualizarPasajero();
             break;
-
         case OPCION_VER_PASAJEROS:
             accionVerPasajeros();
             break;
-
         case OPCION_REGISTRAR_EQUIPAJE:
             accionRegistrarEquipaje();
             break;
-
         case OPCION_ELIMINAR_EQUIPAJE:
             accionEliminarEquipaje();
             break;
-
         case OPCION_VER_EQUIPAJE:
             accionVerEquipaje();
             break;
-
         case OPCION_ASIGNAR_PASAJERO_A_VUELO:
             accionAsignarPasajeroAVuelo();
             break;
-
         case OPCION_REGISTRAR_EQUIPAJE_A_PASAJERO:
             accionRegistrarEquipajeAPasajero();
             break;
-
         case OPCION_VER_PASAJEROS_POR_VUELO:
             accionVerPasajerosPorVuelo();
             break;
-
         case OPCION_VER_EQUIPAJE_POR_PASAJERO:
             accionVerEquipajePorPasajero();
             break;
-
         case OPCION_MENU_SALIR:
             if (!accionSalir()) {
                 *opcion = 0;
             }
             break;
-
         default:
             printf("Opcion no valida.\n");
             return -1;
     }
 
     return 0;
+}
+
+/* ================= MENU EMPLEADO ================= */
+
+void ejecutarMenuEmpleado(void) {
+    int opcion = 0;
+
+    do {
+        if (leerOpcionMenuEmpleado(&opcion) != 0) {
+            pausarPantalla();
+            continue;
+        }
+
+        switch (opcion) {
+            case 1:
+                accionVerAeropuertos();
+                break;
+            case 2:
+                accionVerVuelos();
+                break;
+            case 3:
+                accionVerPasajeros();
+                break;
+            case 4:
+                accionVerEquipaje();
+                break;
+            case 5:
+                accionAsignarPasajeroAVuelo();
+                break;
+            case 6:
+                accionVerPasajerosPorVuelo();
+                break;
+            case 7:
+                accionVerEquipajePorPasajero();
+                break;
+            case 8:
+                printf("Saliendo del menu empleado...\n");
+                break;
+            default:
+                printf("Opcion no valida.\n");
+                break;
+        }
+
+        if (opcion != 8) {
+            pausarPantalla();
+        }
+
+    } while (opcion != 8);
+}
+
+/* ================= MENU PASAJERO ================= */
+
+void mostrarDatosPasajero(const char *dni) {
+    int idx = pasajero_buscar(listaPasajeros, totalPasajeros, dni);
+
+    if (idx == -1) {
+        printf("Pasajero no encontrado.\n");
+        return;
+    }
+
+    printf("DNI: %s\n", listaPasajeros[idx].dni);
+    printf("Nombre: %s\n", listaPasajeros[idx].nombre);
+    printf("Apellido: %s\n", listaPasajeros[idx].apellido);
+    printf("Email: %s\n", listaPasajeros[idx].email);
+    printf("Telefono: %s\n", listaPasajeros[idx].telefono);
+}
+
+void mostrarVuelosPasajero(const char *dni) {
+    int idx = pasajero_buscar(listaPasajeros, totalPasajeros, dni);
+    int j;
+
+    if (idx == -1) {
+        printf("Pasajero no encontrado.\n");
+        return;
+    }
+
+    if (listaPasajeros[idx].num_vuelos == 0) {
+        printf("No tienes vuelos asignados.\n");
+        return;
+    }
+
+    printf("Vuelos del pasajero %s:\n", dni);
+    for (j = 0; j < listaPasajeros[idx].num_vuelos; j++) {
+        printf("- %s\n", listaPasajeros[idx].vuelos[j]);
+    }
+}
+
+void ejecutarMenuPasajero(void) {
+    int opcion = 0;
+    char dni[MAX_DNI];
+
+    printf("\nIntroduce tu DNI: ");
+    if (leerCadena(dni, sizeof(dni)) != 0) {
+        printf("Error al leer el DNI.\n");
+        return;
+    }
+
+    if (pasajero_buscar(listaPasajeros, totalPasajeros, dni) == -1) {
+        printf("No existe un pasajero con ese DNI. Carga primero los CSV o crea el pasajero.\n");
+        return;
+    }
+
+    do {
+        if (leerOpcionMenuPasajero(&opcion) != 0) {
+            pausarPantalla();
+            continue;
+        }
+
+        switch (opcion) {
+            case 1:
+                mostrarCabecera("MIS DATOS");
+                mostrarDatosPasajero(dni);
+                break;
+            case 2:
+                accionVerVuelos();
+                break;
+            case 3:
+                mostrarCabecera("MIS VUELOS");
+                mostrarVuelosPasajero(dni);
+                break;
+            case 4:
+                mostrarCabecera("MI EQUIPAJE");
+                equipaje_ver_por_pasajero(listaEquipaje, totalEquipaje, dni);
+                break;
+            case 5:
+                printf("Saliendo del menu pasajero...\n");
+                break;
+            default:
+                printf("Opcion no valida.\n");
+                break;
+        }
+
+        if (opcion != 5) {
+            pausarPantalla();
+        }
+
+    } while (opcion != 5);
 }
 
 /* ================= MAIN ================= */
@@ -979,7 +1089,6 @@ int main(void) {
         }
 
         switch (rol) {
-
             case ROL_ADMINISTRADOR:
                 do {
                     if (leerOpcionMenu(&opcion) != 0) {
@@ -995,18 +1104,15 @@ int main(void) {
 
                 } while (opcion != OPCION_SALIR);
 
-                /* Al salir del menu admin, volvemos al login */
                 opcion = 0;
                 break;
 
             case ROL_PASAJERO:
-                printf("\nFuncionalidad de pasajero en construccion.\n");
-                pausarPantalla();
+                ejecutarMenuPasajero();
                 break;
 
             case ROL_EMPLEADO:
-                printf("\nFuncionalidad de empleado en construccion.\n");
-                pausarPantalla();
+                ejecutarMenuEmpleado();
                 break;
 
             case ROL_SALIR_LOGIN:
