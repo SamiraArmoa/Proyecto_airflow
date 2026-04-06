@@ -53,14 +53,14 @@ int db_aeropuerto_actualizar(void *db, int id_a,
                              const char *ciudad);
 
 int db_aeropuerto_buscar_id(void *db, int id_a,
-                            char *codigo_out,  /* buffer[16]  */
-                            char *nombre_out,  /* buffer[128] */
-                            char *ciudad_out); /* buffer[128] */
+                            char *codigo_out,
+                            char *nombre_out,
+                            char *ciudad_out);
 
 int db_aeropuerto_buscar_codigo(void *db, const char *codigo,
                                 int  *id_out,
-                                char *nombre_out,  /* buffer[128] */
-                                char *ciudad_out); /* buffer[128] */
+                                char *nombre_out,
+                                char *ciudad_out);
 
 int db_aeropuerto_listar(void *db);
 
