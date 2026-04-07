@@ -7,7 +7,7 @@ empleado_pass=abcd
 pasajero_user=pasajero
 pasajero_pass=1111
 
-ruta_aeropuertos=aeropuertos_grandes.csv
-ruta_vuelos=vuelos_grandes.csv
-ruta_pasajeros=pasajeros_grandes.csv
-ruta_equipajes=equipajes_grandes.csv
+ruta_aeropuertos=csv/aeropuertos_grandes.csv
+ruta_vuelos=csv/vuelos_grandes.csv
+ruta_pasajeros=csv/pasajeros_grandes.csv
+ruta_equipajes=csv/equipajes_grandes.csv
