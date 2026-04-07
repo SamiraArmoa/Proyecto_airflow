@@ -9,7 +9,7 @@
 #include "config/config.h"
 
 #define OPCION_MIN 1
-#define OPCION_SALIR 21
+#define OPCION_SALIR 22
 
 // PROTOTIPOS
 
@@ -264,6 +264,7 @@ typedef enum {
     OPCION_VER_PASAJEROS_POR_VUELO,
     OPCION_VER_EQUIPAJE_POR_PASAJERO,
 
+	OPCION_CAMBIAR_USUARIO,
     OPCION_MENU_SALIR
 } OpcionMenu;
 
@@ -303,7 +304,8 @@ void mostrarMenu(void) {
     printf("19. Ver pasajeros por vuelo\n");
     printf("20. Ver equipaje por pasajero\n");
 
-    printf("21. Salir\n");
+    printf("21. Cambiar usuario\n");
+    printf("22. Salir\n");
 }
 
 int leerOpcionMenu(int *opcion) {
@@ -929,6 +931,10 @@ int escogerOpcion(int *opcion) {
         case OPCION_VER_EQUIPAJE_POR_PASAJERO:
             accionVerEquipajePorPasajero();
             break;
+        case OPCION_CAMBIAR_USUARIO:
+        	printf("Cerrando sesion de administrador...\n");
+        	*opcion = OPCION_MENU_SALIR;
+        	break;
         case OPCION_MENU_SALIR:
             if (!accionSalir()) {
                 *opcion = 0;
@@ -1109,13 +1115,16 @@ int main(void) {
 
                     escogerOpcion(&opcion);
 
-                    if (opcion != OPCION_SALIR) {
+                    if (opcion != OPCION_SALIR && opcion !=OPCION_CAMBIAR_USUARIO) {
                         pausarPantalla();
                     }
 
-                } while (opcion != OPCION_SALIR);
+                } while (opcion != OPCION_SALIR && opcion !=OPCION_CAMBIAR_USUARIO);
 
-                opcion = 0;
+                if(opcion == OPCION_CAMBIAR_USUARIO){
+                	opcion = 0;
+                }
+
                 break;
 
             case ROL_PASAJERO:
