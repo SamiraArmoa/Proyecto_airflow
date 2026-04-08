@@ -9,7 +9,7 @@
 #include "config/config.h"
 
 #define OPCION_MIN 1
-#define OPCION_SALIR 22
+#define OPCION_SALIR 21
 
 typedef enum {
     ROL_INVALIDO = -1,
@@ -86,7 +86,6 @@ int loginSistema(void) {
     printf("Password: ");
     if (leerCadena(password, sizeof(password)) != 0) return ROL_INVALIDO;
 
-    // Simulación básica
     if (strcmp(usuario, "admin") == 0 && strcmp(password, "admin") == 0)
         return ROL_ADMINISTRADOR;
 
@@ -143,6 +142,16 @@ void accionCargarCSV(void) {
 }
 
 
+void guardarTodo(void) {
+    aeropuerto_guardar_csv(listaAeropuertos, totalAeropuertos, configSistema.ruta_aeropuertos);
+    vuelo_guardar_csv(listaVuelos, totalVuelos, configSistema.ruta_vuelos);
+    pasajero_guardar_csv(listaPasajeros, totalPasajeros, configSistema.ruta_pasajeros);
+    equipaje_guardar_csv(listaEquipaje, totalEquipaje, configSistema.ruta_equipajes);
+
+    printf("Datos guardados correctamente.\n");
+}
+
+
 
 void ejecutarMenuEmpleado(void) {
     int op;
@@ -188,6 +197,7 @@ int main(void) {
     }
 
     while (1) {
+
         rol = loginSistema();
 
         if (rol == ROL_INVALIDO) {
@@ -203,17 +213,23 @@ int main(void) {
                 if (leerOpcion(&opcion) != 0) continue;
 
                 switch (opcion) {
+
                     case 1: accionCargarCSV(); break;
+
                     case 5: aeropuerto_ver(listaAeropuertos, totalAeropuertos); break;
                     case 9: vuelo_ver(listaVuelos, totalVuelos); break;
                     case 13: pasajero_ver(listaPasajeros, totalPasajeros); break;
                     case 16: equipaje_ver(listaEquipaje, totalEquipaje); break;
 
-                    case 20: break;
+                    case 20:
+                        guardarTodo();
+                        break;
 
                     case 21:
-                        if (confirmarAccion("¿Salir del programa?"))
+                        if (confirmarAccion("¿Salir del programa?")) {
+                            guardarTodo();
                             return 0;
+                        }
                         break;
 
                     default:
