@@ -1,12 +1,9 @@
 admin_user=admin
 admin_pass=1234
-
 empleado_user=empleado
 empleado_pass=abcd
-
 pasajero_user=pasajero
 pasajero_pass=1111
-
 ruta_aeropuertos=csv/aeropuertos_grandes.csv
 ruta_vuelos=csv/vuelos_grandes.csv
 ruta_pasajeros=csv/pasajeros_grandes.csv

@@ -15,6 +15,7 @@
 
 void limpiarBufferEntrada(void);
 int leerEntero(int *valor);
+int leerFlotante(float *valor);
 int leerCaracter(char *caracter);
 int leerCadena(char *buffer, int tam);
 void pausarPantalla(void);
@@ -66,8 +67,9 @@ void mostrarDatosPasajero(const char *dni);
 void mostrarVuelosPasajero(const char *dni);
 
 int loginSistema(void);
+void inicializarConfigPorDefecto(void);
 
-//ROLES
+// ROLES
 
 typedef enum {
     ROL_INVALIDO = 0,
@@ -76,11 +78,11 @@ typedef enum {
     ROL_PASAJERO = 3
 } RolUsuario;
 
-//CONFIG GLOBAL
+// CONFIG GLOBAL
 
 static Config configSistema;
 
-//DATOS GLOBALES
+// DATOS GLOBALES
 
 static Aeropuerto listaAeropuertos[MAX_AEROPUERTOS];
 static int totalAeropuertos = 0;
@@ -94,7 +96,7 @@ static int totalPasajeros = 0;
 static Equipaje listaEquipaje[MAX_EQUIPAJES];
 static int totalEquipaje = 0;
 
-//FUNCIONES AUXILIARES
+// FUNCIONES AUXILIARES
 
 void limpiarBufferEntrada(void) {
     int c;
@@ -103,36 +105,68 @@ void limpiarBufferEntrada(void) {
 }
 
 int leerEntero(int *valor) {
-    int resultado;
+    char buffer[64];
+    long numero;
+    char extra;
 
     if (valor == NULL) {
         return -1;
     }
 
-    resultado = scanf("%d", valor);
-
-    if (resultado != 1) {
-        printf("Error: introduce un numero valido.\n");
-        limpiarBufferEntrada();
+    if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
         return -1;
     }
 
-    limpiarBufferEntrada();
+    if (sscanf(buffer, " %ld %c", &numero, &extra) != 1) {
+        printf("Error: introduce un numero entero valido.\n");
+        return -1;
+    }
+
+    *valor = (int)numero;
+    return 0;
+}
+
+int leerFlotante(float *valor) {
+    char buffer[64];
+    float numero;
+    char extra;
+
+    if (valor == NULL) {
+        return -1;
+    }
+
+    if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
+        return -1;
+    }
+
+    if (sscanf(buffer, " %f %c", &numero, &extra) != 1) {
+        printf("Error: introduce un numero decimal valido.\n");
+        return -1;
+    }
+
+    *valor = numero;
     return 0;
 }
 
 int leerCaracter(char *caracter) {
+    char buffer[16];
+    char c;
+    char extra;
+
     if (caracter == NULL) {
         return -1;
     }
 
-    if (scanf(" %c", caracter) != 1) {
-        printf("Error al leer el caracter.\n");
-        limpiarBufferEntrada();
+    if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
         return -1;
     }
 
-    limpiarBufferEntrada();
+    if (sscanf(buffer, " %c %c", &c, &extra) != 1) {
+        printf("Error al leer el caracter.\n");
+        return -1;
+    }
+
+    *caracter = c;
     return 0;
 }
 
@@ -167,11 +201,7 @@ int confirmarAccion(const char *mensaje) {
         return 0;
     }
 
-    if (respuesta == 's' || respuesta == 'S') {
-        return 1;
-    }
-
-    return 0;
+    return (respuesta == 's' || respuesta == 'S');
 }
 
 int opcionValida(int opcion) {
@@ -192,6 +222,10 @@ void mostrarFuncionNoDisponible(const char *nombreFuncion) {
     } else {
         printf("Funcion en construccion.\n");
     }
+}
+
+void inicializarConfigPorDefecto(void) {
+    memset(&configSistema, 0, sizeof(configSistema));
 }
 
 /* ================= LOGIN ================= */
@@ -230,7 +264,7 @@ int loginSistema(void) {
     return ROL_INVALIDO;
 }
 
-//OPCIONES ADMIN
+// OPCIONES ADMIN
 
 typedef enum {
     OPCION_CARGAR_CSV = 1,
@@ -264,11 +298,11 @@ typedef enum {
     OPCION_VER_PASAJEROS_POR_VUELO,
     OPCION_VER_EQUIPAJE_POR_PASAJERO,
 
-	OPCION_CAMBIAR_USUARIO,
+    OPCION_CAMBIAR_USUARIO,
     OPCION_MENU_SALIR
 } OpcionMenu;
 
-//MENU ADMIN
+// MENU ADMIN
 
 void mostrarMenu(void) {
     mostrarCabecera("MENU ADMINISTRADOR");
@@ -276,7 +310,7 @@ void mostrarMenu(void) {
     printf("1. Cargar aeropuertos, vuelos, pasajeros y equipajes desde .csv\n");
 
     printf("--- AEROPUERTOS ---\n");
-    printf("2.  Crear aeropuertos\n");
+    printf("2.  Crear aeropuerto\n");
     printf("3.  Eliminar aeropuerto\n");
     printf("4.  Actualizar aeropuerto\n");
     printf("5.  Ver aeropuertos\n");
@@ -344,14 +378,22 @@ void mostrarMenuEmpleado(void) {
 }
 
 int leerOpcionMenuEmpleado(int *opcion) {
-    if (opcion == NULL) return -1;
+    if (opcion == NULL) {
+        return -1;
+    }
+
     mostrarMenuEmpleado();
     printf("\nElige una opcion: ");
-    if (leerEntero(opcion) != 0) return -1;
+
+    if (leerEntero(opcion) != 0) {
+        return -1;
+    }
+
     if (*opcion < 1 || *opcion > 8) {
         printf("Error: opcion no valida.\n");
         return -1;
     }
+
     return 0;
 }
 
@@ -368,21 +410,37 @@ void mostrarMenuPasajero(void) {
 }
 
 int leerOpcionMenuPasajero(int *opcion) {
-    if (opcion == NULL) return -1;
+    if (opcion == NULL) {
+        return -1;
+    }
+
     mostrarMenuPasajero();
     printf("\nElige una opcion: ");
-    if (leerEntero(opcion) != 0) return -1;
+
+    if (leerEntero(opcion) != 0) {
+        return -1;
+    }
+
     if (*opcion < 1 || *opcion > 5) {
         printf("Error: opcion no valida.\n");
         return -1;
     }
+
     return 0;
 }
 
-//ACCIONES CARGA CSV
+// ACCIONES CARGA CSV
 
 void accionCargarCSV(void) {
     mostrarCabecera("CARGAR DATOS DESDE CSV");
+
+    if (strlen(configSistema.ruta_aeropuertos) == 0 ||
+        strlen(configSistema.ruta_vuelos) == 0 ||
+        strlen(configSistema.ruta_pasajeros) == 0 ||
+        strlen(configSistema.ruta_equipajes) == 0) {
+        printf("Error: faltan rutas en config.txt.\n");
+        return;
+    }
 
     totalAeropuertos = 0;
     totalVuelos = 0;
@@ -401,7 +459,7 @@ void accionCargarCSV(void) {
     printf("Equipajes: %d\n", totalEquipaje);
 }
 
-//ACCIONES AEROPUERTOS
+// ACCIONES AEROPUERTOS
 
 void accionCrearAeropuerto(void) {
     char codigo[MAX_CODIGO];
@@ -426,6 +484,11 @@ void accionCrearAeropuerto(void) {
 
     printf("Numero de pistas: ");
     if (leerEntero(&num_pistas) != 0) return;
+
+    if (num_pistas < 0) {
+        printf("El numero de pistas no puede ser negativo.\n");
+        return;
+    }
 
     if (aeropuerto_crear(listaAeropuertos, &totalAeropuertos,
                          codigo, nombre, ciudad, pais, num_pistas) == 0) {
@@ -479,6 +542,11 @@ void accionActualizarAeropuerto(void) {
     printf("Nuevo numero de pistas (0 para no cambiar): ");
     if (leerEntero(&nuevo_num_pistas) != 0) return;
 
+    if (nuevo_num_pistas < 0) {
+        printf("El numero de pistas no puede ser negativo.\n");
+        return;
+    }
+
     if (aeropuerto_actualizar(listaAeropuertos, totalAeropuertos,
                               codigo, nuevo_nombre, nueva_ciudad,
                               nuevo_pais, nuevo_num_pistas) == 0) {
@@ -493,7 +561,7 @@ void accionVerAeropuertos(void) {
     aeropuerto_ver(listaAeropuertos, totalAeropuertos);
 }
 
-//ACCIONES VUELOS
+// ACCIONES VUELOS
 
 void accionCrearVuelo(void) {
     char id[MAX_ID_VUELO];
@@ -530,6 +598,11 @@ void accionCrearVuelo(void) {
 
     printf("Capacidad: ");
     if (leerEntero(&capacidad) != 0) return;
+
+    if (capacidad <= 0) {
+        printf("La capacidad debe ser mayor que 0.\n");
+        return;
+    }
 
     if (vuelo_crear(listaVuelos, &totalVuelos, id, aerolinea, origen, destino,
                     fecha, hora_salida, hora_llegada, capacidad) == 0) {
@@ -579,6 +652,11 @@ void accionActualizarVuelo(void) {
     printf("Nueva capacidad (0 para no cambiar): ");
     if (leerEntero(&nueva_capacidad) != 0) return;
 
+    if (nueva_capacidad < 0) {
+        printf("La capacidad no puede ser negativa.\n");
+        return;
+    }
+
     if (vuelo_actualizar(listaVuelos, totalVuelos, id,
                          nueva_hora_salida, nueva_hora_llegada, nueva_capacidad) == 0) {
         printf("Vuelo actualizado correctamente.\n");
@@ -592,7 +670,7 @@ void accionVerVuelos(void) {
     vuelo_ver(listaVuelos, totalVuelos);
 }
 
-//ACCIONES PASAJEROS
+// ACCIONES PASAJEROS
 
 void accionCrearPasajero(void) {
     char dni[MAX_DNI];
@@ -673,7 +751,7 @@ void accionVerPasajeros(void) {
     pasajero_ver(listaPasajeros, totalPasajeros);
 }
 
-//OPERACIONES
+// OPERACIONES
 
 void accionAsignarPasajeroAVuelo(void) {
     char dni[MAX_DNI];
@@ -688,30 +766,30 @@ void accionAsignarPasajeroAVuelo(void) {
     if (leerCadena(id, sizeof(id)) != 0) return;
 
     if (vuelo_buscar(listaVuelos, totalVuelos, id) == -1) {
-        printf("El vuelo no existe\n");
+        printf("El vuelo no existe.\n");
         return;
     }
 
     if (pasajero_buscar(listaPasajeros, totalPasajeros, dni) == -1) {
-        printf("El pasajero no existe\n");
+        printf("El pasajero no existe.\n");
         return;
     }
 
     if (vuelo_reservar_asiento(listaVuelos, totalVuelos, id) != 0) {
-        printf("No hay asientos disponibles\n");
+        printf("No hay asientos disponibles.\n");
         return;
     }
 
     if (pasajero_asignar_vuelo(listaPasajeros, totalPasajeros, dni, id) == 0) {
-        printf("Pasajero asignado correctamente\n");
+        printf("Pasajero asignado correctamente.\n");
     } else {
         vuelo_liberar_asiento(listaVuelos, totalVuelos, id);
-        printf("No se pudo asignar el pasajero al vuelo\n");
+        printf("No se pudo asignar el pasajero al vuelo.\n");
     }
 }
 
 void accionRegistrarEquipajeAPasajero(void) {
-    char dni[20];
+    char dni[MAX_DNI];
     char id_eq[MAX_ID_EQ];
 
     mostrarCabecera("REGISTRAR EQUIPAJE A PASAJERO");
@@ -773,7 +851,7 @@ void accionVerPasajerosPorVuelo(void) {
 }
 
 void accionVerEquipajePorPasajero(void) {
-    char dni[20];
+    char dni[MAX_DNI];
 
     mostrarCabecera("VER EQUIPAJE POR PASAJERO");
 
@@ -787,15 +865,15 @@ void accionVerEquipajePorPasajero(void) {
 
     equipaje_ver_por_pasajero(listaEquipaje, totalEquipaje, dni);
 }
+
 // EQUIPAJE
 
 void accionRegistrarEquipaje(void) {
     char id_eq[MAX_ID_EQ];
-    char dni[20];
+    char dni[MAX_DNI];
     char tipo[MAX_TIPO_EQ];
     float peso;
     int facturado;
-    char buf[32];
 
     mostrarCabecera("REGISTRAR EQUIPAJE");
 
@@ -814,11 +892,20 @@ void accionRegistrarEquipaje(void) {
     if (leerCadena(tipo, sizeof(tipo)) != 0) return;
 
     printf("Peso en kg: ");
-    if (leerCadena(buf, sizeof(buf)) != 0) return;
-    peso = (float)atof(buf);
+    if (leerFlotante(&peso) != 0) return;
+
+    if (peso < 0.0f) {
+        printf("El peso no puede ser negativo.\n");
+        return;
+    }
 
     printf("Facturado (1=si, 0=no): ");
     if (leerEntero(&facturado) != 0) return;
+
+    if (facturado != 0 && facturado != 1) {
+        printf("El valor de facturado debe ser 0 o 1.\n");
+        return;
+    }
 
     if (equipaje_registrar(listaEquipaje, &totalEquipaje,
                            id_eq, dni, tipo, peso, facturado) == 0) {
@@ -855,15 +942,17 @@ void accionVerEquipaje(void) {
 
 int accionSalir(void) {
     mostrarCabecera("SALIR");
+
     if (confirmarAccion("¿Seguro que deseas salir del sistema?")) {
         printf("Saliendo del sistema...\n");
         return 1;
     }
+
     printf("Salida cancelada.\n");
     return 0;
 }
 
-//CONTROLADOR ADMIN
+// CONTROLADOR ADMIN
 
 int escogerOpcion(int *opcion) {
     if (opcion == NULL) {
@@ -932,9 +1021,8 @@ int escogerOpcion(int *opcion) {
             accionVerEquipajePorPasajero();
             break;
         case OPCION_CAMBIAR_USUARIO:
-        	printf("Cerrando sesion de administrador...\n");
-        	*opcion = OPCION_MENU_SALIR;
-        	break;
+            printf("Cerrando sesion de administrador...\n");
+            break;
         case OPCION_MENU_SALIR:
             if (!accionSalir()) {
                 *opcion = 0;
@@ -948,7 +1036,7 @@ int escogerOpcion(int *opcion) {
     return 0;
 }
 
-//MENU EMPLEADO
+// MENU EMPLEADO
 
 void ejecutarMenuEmpleado(void) {
     int opcion = 0;
@@ -1091,6 +1179,8 @@ int main(void) {
     int rol = 0;
     int opcion = 0;
 
+    inicializarConfigPorDefecto();
+
     if (cargarConfig("config.txt", &configSistema) != 0) {
         printf("Error: no se pudo cargar config.txt\n");
         return 1;
@@ -1107,6 +1197,8 @@ int main(void) {
 
         switch (rol) {
             case ROL_ADMINISTRADOR:
+                opcion = 0;
+
                 do {
                     if (leerOpcionMenu(&opcion) != 0) {
                         pausarPantalla();
@@ -1115,14 +1207,14 @@ int main(void) {
 
                     escogerOpcion(&opcion);
 
-                    if (opcion != OPCION_SALIR && opcion !=OPCION_CAMBIAR_USUARIO) {
+                    if (opcion != OPCION_SALIR && opcion != OPCION_CAMBIAR_USUARIO) {
                         pausarPantalla();
                     }
 
-                } while (opcion != OPCION_SALIR && opcion !=OPCION_CAMBIAR_USUARIO);
+                } while (opcion != OPCION_SALIR && opcion != OPCION_CAMBIAR_USUARIO);
 
-                if(opcion == OPCION_CAMBIAR_USUARIO){
-                	opcion = 0;
+                if (opcion == OPCION_CAMBIAR_USUARIO) {
+                    opcion = 0;
                 }
 
                 break;
