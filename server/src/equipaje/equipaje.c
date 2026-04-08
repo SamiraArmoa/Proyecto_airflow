@@ -1,9 +1,3 @@
-/*
- * equipaje.c
- *
- *  Created on: 2 abr 2026
- *      Author: oier.artabe
- */
 
 #include "equipaje.h"
 #include <stdio.h>
