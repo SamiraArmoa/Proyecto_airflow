@@ -42,6 +42,7 @@ int db_inicializar(void *db) {
     const char *sql =
         "CREATE TABLE IF NOT EXISTS Usuario ("
         "ID_US INTEGER PRIMARY KEY AUTOINCREMENT,"
+    	"DNI TEXT UNIQUE,"
         "NOMBRE TEXT, EMAIL TEXT UNIQUE, TLF INTEGER,"
         "CONTRASENA TEXT, ROL INTEGER);"
 
@@ -196,24 +197,50 @@ int db_cargar_vuelos_csv(void *db, const char *ruta) {
     if (!f) return -1;
 
     char linea[256];
-    fgets(linea,sizeof(linea),f);
+    fgets(linea, sizeof(linea), f);
 
     int count = 0;
+    while (fgets(linea, sizeof(linea), f)) {
+        char *cod        = strtok(linea, ",");
+        char *aerolinea  = strtok(NULL,  ",");
+        char *orig       = strtok(NULL,  ",");
+        char *dest       = strtok(NULL,  ",");
+        char *fecha      = strtok(NULL,  ",");
+        char *h_salida   = strtok(NULL,  ",");
+        char *h_llegada  = strtok(NULL,  ",");
+        char *cap        = strtok(NULL,  ",");
 
-    while(fgets(linea,sizeof(linea),f)){
-        char *cod = strtok(linea,",");
-        char *orig = strtok(NULL,",");
-        char *dest = strtok(NULL,",");
-        char *fh = strtok(NULL,",");
-        char *precio = strtok(NULL,",");
-        char *cap = strtok(NULL,",");
+        if (!cod || !orig || !dest || !fecha) continue;
 
-        if(!cod||!orig||!dest) continue;
+        (void)aerolinea;
+        (void)h_llegada;
 
-        db_vuelo_insertar(db,cod,atoi(orig),atoi(dest),fh,atof(precio),atoi(cap),NULL);
+        // Concatenar fecha y hora_salida en un solo string
+        char fecha_hora[64] = "";
+        if (fecha && h_salida) {
+            // Limpiar posible \n en h_salida
+            h_salida[strcspn(h_salida, "\r\n")] = '\0';
+            fecha[strcspn(fecha, "\r\n")]        = '\0';
+            snprintf(fecha_hora, sizeof(fecha_hora), "%s %s", fecha, h_salida);
+        }
+
+        int id_orig = -1, id_dest = -1;
+        char nom[128], ciu[128];
+        db_aeropuerto_buscar_codigo(db, orig, &id_orig, nom, ciu);
+        db_aeropuerto_buscar_codigo(db, dest, &id_dest, nom, ciu);
+
+        if (id_orig == -1 || id_dest == -1) {
+            fprintf(stderr, "[CSV Vuelos] Aeropuerto no encontrado: '%s' o '%s'\n", orig, dest);
+            continue;
+        }
+
+        db_vuelo_insertar(db, cod, id_orig, id_dest,
+                          fecha_hora,
+                          cap ? atof(cap) : 0.0,
+                          cap ? atoi(cap) : 0,
+                          NULL);
         count++;
     }
-
     fclose(f);
     return count;
 }
@@ -245,31 +272,25 @@ int db_cargar_usuarios_csv(void *db, const char *ruta) {
     fclose(f);
     return count;
 }
+int db_aeropuerto_buscar_codigo(void *db, const char *codigo,
+                                int *id_out, char *nombre_out, char *ciudad_out) {
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(DB(db),
+        "SELECT ID_A, NOMBRE, CIUDAD FROM Aeropuerto WHERE CODIGO=?",
+        -1, &stmt, NULL);
+    sqlite3_bind_text(stmt, 1, codigo, -1, SQLITE_TRANSIENT);
 
-//int db_cargar_equipajes_csv(void *db, const char *ruta) {
-//    FILE *f = fopen(ruta, "r");
-//    if (!f) return -1;
-//
-//    char linea[256];
-//    fgets(linea,sizeof(linea),f);
-//
-//    int count = 0;
-//
-//    while(fgets(linea,sizeof(linea),f)){
-//        char *id_billete = strtok(linea,",");
-//        char *tipo = strtok(NULL,",");
-//        char *peso = strtok(NULL,",");
-//        char *desc = strtok(NULL,",");
-//
-//        if(!id_billete||!tipo) continue;
-//
-//        db_equipaje_insertar(db,atoi(id_billete),tipo,atof(peso),desc,NULL);
-//        count++;
-//    }
-//
-//    fclose(f);
-//    return count;
-//}
+    int rc = -1;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        if (id_out)     *id_out = sqlite3_column_int(stmt, 0);
+        if (nombre_out)  strcpy(nombre_out, (const char*)sqlite3_column_text(stmt, 1));
+        if (ciudad_out)  strcpy(ciudad_out, (const char*)sqlite3_column_text(stmt, 2));
+        rc = 0;
+    }
+    sqlite3_finalize(stmt);
+    return rc;
+}
+
 int db_cargar_equipajes_csv(void *db, const char *ruta) {
     FILE *f = fopen(ruta, "r");
     if (!f) return -1;
@@ -320,16 +341,27 @@ int db_aeropuerto_listar(void *db) {
 int db_vuelo_listar(void *db) {
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(DB(db),
-        "SELECT ID_VUELO,COD_VUELO,ID_ORIGEN,ID_DESTINO FROM Vuelo",
-        -1,&stmt,NULL);
+        "SELECT v.ID_VUELO, v.COD_VUELO, "
+        "       a1.CODIGO, a2.CODIGO, "
+        "       v.FECHA_HORA, v.PRECIO, v.CAPACIDAD "
+        "FROM Vuelo v "
+        "LEFT JOIN Aeropuerto a1 ON v.ID_ORIGEN  = a1.ID_A "
+        "LEFT JOIN Aeropuerto a2 ON v.ID_DESTINO = a2.ID_A",
+        -1, &stmt, NULL);
 
-    printf("\nVUELOS:\n");
-    while(sqlite3_step(stmt)==SQLITE_ROW){
-        printf("%d | %s | %d -> %d\n",
-            sqlite3_column_int(stmt,0),
-            sqlite3_column_text(stmt,1),
-            sqlite3_column_int(stmt,2),
-            sqlite3_column_int(stmt,3));
+    printf("\n%-4s | %-10s | %-6s -> %-6s | %-20s | %8s | %s\n",
+           "ID", "Cod.Vuelo", "Orig", "Dest", "Fecha/Hora", "Precio", "Cap.");
+    printf("%-80s\n", "--------------------------------------------------------------------------------");
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        printf("%-4d | %-10s | %-6s -> %-6s | %-20s | %8.2f | %d\n",
+            sqlite3_column_int   (stmt, 0),
+            sqlite3_column_text  (stmt, 1),
+            sqlite3_column_text  (stmt, 2),   // codigo origen
+            sqlite3_column_text  (stmt, 3),   // codigo destino
+            sqlite3_column_text  (stmt, 4),
+            sqlite3_column_double(stmt, 5),
+            sqlite3_column_int   (stmt, 6));
     }
 
     sqlite3_finalize(stmt);
@@ -349,6 +381,26 @@ int db_usuario_listar(void *db) {
             sqlite3_column_text(stmt,1),
             sqlite3_column_text(stmt,2),
             sqlite3_column_int(stmt,3));
+    }
+
+    sqlite3_finalize(stmt);
+    return 0;
+}
+int db_equipaje_listar(void *db) {
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(DB(db),
+        "SELECT ID_EQUIPAJE, CODIGO, DNI, ID_VUELO, PESO, ESTADO FROM Equipaje",
+        -1, &stmt, NULL);
+
+    printf("\nEQUIPAJES:\n");
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        printf("%d | %s | DNI: %s | Vuelo: %d | %.2f kg | %s\n",
+            sqlite3_column_int   (stmt, 0),
+            sqlite3_column_text  (stmt, 1),
+            sqlite3_column_text  (stmt, 2),
+            sqlite3_column_int   (stmt, 3),
+            sqlite3_column_double(stmt, 4),
+            sqlite3_column_text  (stmt, 5));
     }
 
     sqlite3_finalize(stmt);
