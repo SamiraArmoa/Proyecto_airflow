@@ -194,26 +194,26 @@ int main(void) {
                         accionCargarCSV();
                         break;
 
-                    case 5:
+                    case 2:
                         db_aeropuerto_listar(db);
                         break;
 
-                    case 9:
+                    case 3:
                         db_vuelo_listar(db);
                         break;
 
-                    case 13:
+                    case 4:
                         db_usuario_listar(db);
                         break;
 
-                    case 16:
+                    case 5:
                     	db_equipaje_listar(db);
                         break;
 
-                    case 20:
+                    case 6:
                         break;
 
-                    case 21:
+                    case 7:
                         if (confirmarAccion("¿Salir del programa?")) {
                             db_cerrar(db);
                             return 0;
