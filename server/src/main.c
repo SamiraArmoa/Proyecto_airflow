@@ -82,12 +82,12 @@ void mostrarMenu(void) {
     mostrarCabecera("MENU ADMIN");
 
     printf("1. Cargar CSV en BD\n");
-    printf("5. Ver aeropuertos\n");
-    printf("9. Ver vuelos\n");
-    printf("13. Ver pasajeros\n");
-    printf("16. Ver equipaje\n");
-    printf("20. Cambiar usuario\n");
-    printf("21. Salir\n");
+    printf("2. Ver aeropuertos\n");
+    printf("3. Ver vuelos\n");
+    printf("4. Ver pasajeros\n");
+    printf("5. Ver equipaje\n");
+    printf("6. Cambiar usuario\n");
+    printf("7. Salir\n");
 }
 
 int leerOpcion(int *op) {
