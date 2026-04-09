@@ -14,7 +14,7 @@ int   db_inicializar(void *db);   // crea tablas si no existen
 int   db_activar_fk(void *db);
 
 //Usuario
-int db_usuario_insertar(void *db,
+int db_usuario_insertar(void *db, const char *dni,
                         const char *nombre, const char *email,
                         long long tlf, const char *contrasena, int rol,
                         int *id_out);
@@ -110,9 +110,9 @@ int db_billete_listar_por_vuelo(void *db, int id_vuelo);
 
 //Equipaje
 int db_equipaje_insertar(void *db,
-                         int id_billete,
-                         const char *tipo, double peso,
-                         const char *descripcion,
+                         const char *codigo, const char *dni,
+                         int id_vuelo, double peso,
+                         const char *estado,
                          int *id_out);
 
 int db_equipaje_eliminar(void *db, int id_equipaje);
@@ -125,6 +125,8 @@ int db_equipaje_buscar_id(void *db, int id_equipaje,
 
 int db_equipaje_listar_por_billete(void *db, int id_billete);
 
+int db_equipaje_listar(void *db);
+
 //Consultas join
 int db_pasajeros_por_vuelo(void *db, int id_vuelo);
 int db_equipaje_por_usuario(void *db, int id_usuario);
@@ -133,6 +135,7 @@ int db_equipaje_por_usuario(void *db, int id_usuario);
 int db_cargar_aeropuertos_csv(void *db, const char *ruta);
 int db_cargar_vuelos_csv(void *db, const char *ruta);
 int db_cargar_usuarios_csv(void *db, const char *ruta);
+int db_cargar_equipajes_csv(void *db, const char *ruta);
 
 #ifdef __cplusplus
 }

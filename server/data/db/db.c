@@ -55,34 +55,36 @@ int db_inicializar(void *db) {
         "FECHA_HORA TEXT, PRECIO REAL, CAPACIDAD INTEGER);"
 
         "CREATE TABLE IF NOT EXISTS Equipaje ("
-        "ID_EQ INTEGER PRIMARY KEY AUTOINCREMENT,"
-        "ID_BILLETE INTEGER, TIPO TEXT, PESO REAL, DESCRIPCION TEXT);";
+        "ID_EQUIPAJE INTEGER PRIMARY KEY AUTOINCREMENT,"
+        "CODIGO TEXT UNIQUE, DNI TEXT, ID_VUELO INTEGER, PESO REAL, ESTADO TEXT);"
+
+    	"CREATE TABLE IF NOT EXISTS Billete("
+    	"ID_BILLETE INTEGER PRIMARY KEY AUTOINCREMENT,"
+    	"ID_USUARIO INTEGER, ID_VUELO INTEGER,"
+    	"ASIENTO TEXT, FECHA_COMPRA TEXT);";
 
     return exec_simple(DB(db), sql);
 }
 
-
-
-int db_usuario_insertar(void *db,
+int db_usuario_insertar(void *db, const char *dni,
                         const char *nombre, const char *email,
                         long long tlf, const char *contrasena, int rol,
                         int *id_out) {
-
     sqlite3_stmt *stmt;
     const char *sql =
-        "INSERT INTO Usuario(NOMBRE,EMAIL,TLF,CONTRASENA,ROL) VALUES(?,?,?,?,?)";
+        "INSERT OR IGNORE INTO Usuario(DNI,NOMBRE,EMAIL,TLF,CONTRASENA,ROL)"
+        " VALUES(?,?,?,?,?,?)";
 
     sqlite3_prepare_v2(DB(db), sql, -1, &stmt, NULL);
+    sqlite3_bind_text (stmt, 1, dni,        -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text (stmt, 2, nombre,     -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text (stmt, 3, email,      -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int64(stmt, 4, tlf);
+    sqlite3_bind_text (stmt, 5, contrasena, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int  (stmt, 6, rol);
 
-    sqlite3_bind_text(stmt,1,nombre,-1,SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt,2,email,-1,SQLITE_TRANSIENT);
-    sqlite3_bind_int64(stmt,3,tlf);
-    sqlite3_bind_text(stmt,4,contrasena,-1,SQLITE_TRANSIENT);
-    sqlite3_bind_int(stmt,5,rol);
-
-    if (sqlite3_step(stmt) == SQLITE_DONE) {
+    if (sqlite3_step(stmt) == SQLITE_DONE)
         if (id_out) *id_out = (int)sqlite3_last_insert_rowid(DB(db));
-    }
 
     sqlite3_finalize(stmt);
     return 0;
@@ -140,25 +142,24 @@ int db_vuelo_insertar(void *db,
 }
 
 int db_equipaje_insertar(void *db,
-                         int id_billete,
-                         const char *tipo, double peso,
-                         const char *descripcion,
+                         const char *codigo, const char *dni,
+                         int id_vuelo, double peso,
+                         const char *estado,
                          int *id_out) {
-
     sqlite3_stmt *stmt;
     const char *sql =
-        "INSERT INTO Equipaje(ID_BILLETE,TIPO,PESO,DESCRIPCION) VALUES(?,?,?,?)";
+        "INSERT OR IGNORE INTO Equipaje(CODIGO,DNI,ID_VUELO,PESO,ESTADO)"
+        " VALUES(?,?,?,?,?)";
 
     sqlite3_prepare_v2(DB(db), sql, -1, &stmt, NULL);
+    sqlite3_bind_text  (stmt, 1, codigo,  -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text  (stmt, 2, dni,     -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int   (stmt, 3, id_vuelo);
+    sqlite3_bind_double(stmt, 4, peso);
+    sqlite3_bind_text  (stmt, 5, estado,  -1, SQLITE_TRANSIENT);
 
-    sqlite3_bind_int(stmt,1,id_billete);
-    sqlite3_bind_text(stmt,2,tipo,-1,SQLITE_TRANSIENT);
-    sqlite3_bind_double(stmt,3,peso);
-    sqlite3_bind_text(stmt,4,descripcion,-1,SQLITE_TRANSIENT);
-
-    if (sqlite3_step(stmt) == SQLITE_DONE) {
+    if (sqlite3_step(stmt) == SQLITE_DONE)
         if (id_out) *id_out = (int)sqlite3_last_insert_rowid(DB(db));
-    }
 
     sqlite3_finalize(stmt);
     return 0;
@@ -227,13 +228,17 @@ int db_cargar_usuarios_csv(void *db, const char *ruta) {
     int count = 0;
 
     while(fgets(linea,sizeof(linea),f)){
-        char *nom = strtok(linea,",");
+    	char *dni= strtok(linea,",");
+        char *nom = strtok(NULL,",");
+        char *ape = strtok(NULL,",");
         char *email = strtok(NULL,",");
         char *tlf = strtok(NULL,",");
 
-        if(!nom||!email) continue;
+        if(!dni ||!nom||!email) continue;
 
-        db_usuario_insertar(db,nom,email,atoll(tlf),"1234",2,NULL);
+        char nombreCompleto[128];
+        snprintf(nombreCompleto, sizeof(nombreCompleto), "%s %s",nom,ape ? ape:"");
+        db_usuario_insertar(db,dni,nombreCompleto,email, tlf ? atoll(tlf):0,"1234",2,NULL);
         count++;
     }
 
@@ -241,31 +246,57 @@ int db_cargar_usuarios_csv(void *db, const char *ruta) {
     return count;
 }
 
+//int db_cargar_equipajes_csv(void *db, const char *ruta) {
+//    FILE *f = fopen(ruta, "r");
+//    if (!f) return -1;
+//
+//    char linea[256];
+//    fgets(linea,sizeof(linea),f);
+//
+//    int count = 0;
+//
+//    while(fgets(linea,sizeof(linea),f)){
+//        char *id_billete = strtok(linea,",");
+//        char *tipo = strtok(NULL,",");
+//        char *peso = strtok(NULL,",");
+//        char *desc = strtok(NULL,",");
+//
+//        if(!id_billete||!tipo) continue;
+//
+//        db_equipaje_insertar(db,atoi(id_billete),tipo,atof(peso),desc,NULL);
+//        count++;
+//    }
+//
+//    fclose(f);
+//    return count;
+//}
 int db_cargar_equipajes_csv(void *db, const char *ruta) {
     FILE *f = fopen(ruta, "r");
     if (!f) return -1;
 
     char linea[256];
-    fgets(linea,sizeof(linea),f);
+    fgets(linea, sizeof(linea), f); // saltar cabecera
 
     int count = 0;
+    while (fgets(linea, sizeof(linea), f)) {
+        char *codigo   = strtok(linea, ",");
+        char *dni      = strtok(NULL,  ",");
+        char *id_vuelo = strtok(NULL,  ",");
+        char *peso     = strtok(NULL,  ",");
+        char *estado   = strtok(NULL,  ",");
 
-    while(fgets(linea,sizeof(linea),f)){
-        char *id_billete = strtok(linea,",");
-        char *tipo = strtok(NULL,",");
-        char *peso = strtok(NULL,",");
-        char *desc = strtok(NULL,",");
+        if (!codigo || !dni || !id_vuelo) continue;
 
-        if(!id_billete||!tipo) continue;
-
-        db_equipaje_insertar(db,atoi(id_billete),tipo,atof(peso),desc,NULL);
+        db_equipaje_insertar(db, codigo, dni,
+                             atoi(id_vuelo),
+                             peso   ? atof(peso) : 0.0,
+                             estado ? estado : "",
+                             NULL);
         count++;
     }
-
     fclose(f);
     return count;
 }
-
 
 int db_aeropuerto_listar(void *db) {
     sqlite3_stmt *stmt;
