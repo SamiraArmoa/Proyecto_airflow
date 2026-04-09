@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "usuario.h"
-
 #define MAX_LENGTH 100
 
 // Crear un nuevo empleado
@@ -22,25 +21,25 @@ int crearUsuario() {
 	fflush(stdin);
 	fgets(nom, 100, stdin);
 	nom[strcspn(nom, "\n")] = '\0';
-	// Asignar memoria din�mica para el nombre segun la longitud
+
 	nombre = (char*)malloc((strlen(nom) + 1) * sizeof(char));
 	if (nombre == NULL) {
 		printf("Error al asignar memoria para el nombre.\n");
-		return -1;  // Error si no se pudo asignar memoria
+		return -1;
 	}
-	strcpy(nombre, nom);  // Copiar la cadena le�da en nombre
+	strcpy(nombre, nom);
 
 	printf("Email: ");
 	fflush(stdin);
 	fgets(em, 100, stdin);
 	nom[strcspn(em, "\n")] = '\0';
-	// Asignar memoria din�mica para el nombre seg�n la longitud
+
 	email = (char *)malloc((strlen(em) + 1) * sizeof(char));
 	if (email == NULL) {
 		printf("Error al asignar memoria para el nombre.\n");
-		return -1;  // Error si no se pudo asignar memoria
+		return -1;
 	}
-	strcpy(email, em);  // Copiar la cadena leida en nombre
+	strcpy(email, em);
 
 	printf("Telefono: ");
 	fflush(stdin);
@@ -50,13 +49,13 @@ int crearUsuario() {
 	printf("\nContrasena: ");
 	fgets(con, 100, stdin);
 	con[strcspn(con, "\n")] = '\0';
-	// Asignar memoria dinamica para el nombre segun la longitud
+
 	contrasena = (char *)malloc((strlen(con) + 1) * sizeof(char));
 	if (contrasena == NULL) {
 		printf("Error al asignar memoria para el tipo.\n");
-		return -1;  // Error si no se pudo asignar memoria
+		return -1;
 	}
-	strcpy(contrasena, con);  // Copiar la cadena leida en nombre
+	strcpy(contrasena, con);
 
 	//insertarClientes(nombre, email, telefono, contrasena, CLIENT_DB_PATH);
 	fflush(stdout);
@@ -66,7 +65,6 @@ int crearUsuario() {
 // Eliminar empleado por nombre
 int eliminarUsuario() {
 	int id_cl = 0;
-//	imprimirUsuarios();
 	printf("Inserta el id del usuario que quieres eliminar: ");
 	scanf("%d", &id_cl);
 
@@ -80,18 +78,13 @@ int eliminarUsuario() {
 
 	if (confirmacion != 1) {
 		printf("Eliminacion cancelada.\n");
-		return 0; // Salimos sin hacer nada
+		return 0;
 	}
 
 	//deleteClientes(id_cl, CLIENT_DB_PATH);
 	return 0;
 }
 
-// Mostrar todos los empleados
-//int imprimirClientes() {
-//	int rc = verClientes(CLIENT_DB_PATH);
-//	return rc;
-//}
 
 // Actualizar por ID
 int actualizarUsuario() {
@@ -104,7 +97,6 @@ int actualizarUsuario() {
 	char em[100];
 	char con[100];
 
-//	imprimirUsuarios();
 	printf("Inserta el id del usuario que quieres actualizar: ");
 	fflush(stdin);
 	scanf("%i", &id_us);
@@ -113,26 +105,25 @@ int actualizarUsuario() {
 	fflush(stdin);
 	fgets(nom, 100, stdin);
 	nom[strcspn(nom, "\n")] = '\0';
-	// Asignar memoria din�mica para el nombre seg�n la longitud
+
 	nombre = (char *)malloc((strlen(nom) + 1) * sizeof(char));
 	if (nombre == NULL) {
 		printf("Error al asignar memoria para el nombre.\n");
-		return -1;  // Error si no se pudo asignar memoria
+		return -1;
 	}
-	strcpy(nombre, nom);  // Copiar la cadena le�da en nombre
-
+	strcpy(nombre, nom);
 	printf("Email: ");
 	fflush(stdin);
 	fgets(em, 25, stdin);
-	em[strcspn(em, "\n")] = '\0';  // Fix: changed from cargo to car
-	// Asignar memoria din�mica para el cargo seg�n la longitud
+	em[strcspn(em, "\n")] = '\0';
+
 	email = (char *)malloc((strlen(em) + 1) * sizeof(char));
 	if (email == NULL) {
-		free(nombre);  // Free previously allocated memory
+		free(nombre);
 		printf("Error al asignar memoria para el cargo.\n");
-		return -1;  // Error si no se pudo asignar memoria
+		return -1;
 	}
-	strcpy(email, em);  // Copiar la cadena le�da en cargo
+	strcpy(email, em);
 
 	printf("Telefono: ");
 	fflush(stdin);
@@ -141,18 +132,17 @@ int actualizarUsuario() {
 	printf("Contrasena: ");
 	fflush(stdin);
 	fgets(con, 75, stdin);
-	con[strcspn(con, "\n")] = '\0'; // Fix: changed from cuentaBancaria to cuenBan
-	// Asignar memoria din�mica para la cuenta bancaria seg�n la longitud
+	con[strcspn(con, "\n")] = '\0';
+
 	contrasena = (char *)malloc((strlen(con) + 1) * sizeof(char));
 	if (contrasena == NULL) {
-		free(nombre);  // Free previously allocated memory
-		free(email); // Free previously allocated memory
+		free(nombre);
+		free(email);
 		printf("Error al asignar memoria para la cuenta bancaria.\n");
-		return -1;  // Error si no se pudo asignar memoria
+		return -1;
 	}
 
-	strcpy(contrasena, con); // Copiar la cadena le�da en cuenta bancaria
-//	updateClientes(id_cl, nombre, email, telefono, contrasena, CLIENT_DB_PATH);
+	strcpy(contrasena, con);
 	return 0;
 }
 
