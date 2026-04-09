@@ -15,6 +15,8 @@ typedef struct {
     char ruta_vuelos[200];
     char ruta_pasajeros[200];
     char ruta_equipajes[200];
+
+    char ruta_db[200];
 } Config;
 
 int cargarConfig(const char *ruta, Config *cfg);
