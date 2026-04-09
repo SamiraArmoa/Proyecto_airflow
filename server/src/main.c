@@ -3,10 +3,6 @@
 #include <string.h>
 
 #include "usuario/usuario.h"
-#include "aeropuerto/aeropuerto.h"
-#include "vuelo/vuelo.h"
-#include "pasajero/pasajero.h"
-#include "equipaje/equipaje.h"
 #include "config/config.h"
 #include "../data/db/db.h"
 
@@ -24,19 +20,6 @@ static Config configSistema;
 
 
 static void *db = NULL;
-
-static Aeropuerto listaAeropuertos[MAX_AEROPUERTOS];
-static int totalAeropuertos = 0;
-
-static Vuelo listaVuelos[MAX_VUELOS];
-static int totalVuelos = 0;
-
-static Pasajero listaPasajeros[MAX_PASAJEROS];
-static int totalPasajeros = 0;
-
-static Equipaje listaEquipaje[MAX_EQUIPAJES];
-static int totalEquipaje = 0;
-
 
 
 void pausarPantalla(void) {
