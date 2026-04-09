@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "usuario/usuario.h"
 #include "aeropuerto/aeropuerto.h"
 #include "vuelo/vuelo.h"
 #include "pasajero/pasajero.h"
 #include "equipaje/equipaje.h"
 #include "config/config.h"
+#include "../data/db/db.h"
 
 #define OPCION_MIN 1
 #define OPCION_SALIR 21
@@ -19,6 +21,9 @@ typedef enum {
 } RolUsuario;
 
 static Config configSistema;
+
+
+static void *db = NULL;
 
 static Aeropuerto listaAeropuertos[MAX_AEROPUERTOS];
 static int totalAeropuertos = 0;
@@ -53,13 +58,6 @@ int leerEntero(int *valor) {
     return (sscanf(buffer, "%d", valor) == 1) ? 0 : -1;
 }
 
-int leerFlotante(float *valor) {
-    char buffer[64];
-    if (!valor) return -1;
-    if (!fgets(buffer, sizeof(buffer), stdin)) return -1;
-    return (sscanf(buffer, "%f", valor) == 1) ? 0 : -1;
-}
-
 int confirmarAccion(const char *msg) {
     char r[4];
     printf("%s (s/n): ", msg);
@@ -68,10 +66,10 @@ int confirmarAccion(const char *msg) {
 }
 
 void mostrarCabecera(const char *t) {
-    printf("\n===\n");
-    printf("%s\n", t);
-    printf("===\n");
+    printf("\n===\n%s\n===\n", t);
 }
+
+
 
 
 int loginSistema(void) {
@@ -99,28 +97,16 @@ int loginSistema(void) {
 }
 
 
+
+
 void mostrarMenu(void) {
     mostrarCabecera("MENU ADMIN");
 
-    printf("1. Cargar CSV\n");
-    printf("2. Crear aeropuerto\n");
-    printf("3. Eliminar aeropuerto\n");
-    printf("4. Actualizar aeropuerto\n");
+    printf("1. Cargar CSV en BD\n");
     printf("5. Ver aeropuertos\n");
-    printf("6. Crear vuelo\n");
-    printf("7. Eliminar vuelo\n");
-    printf("8. Actualizar vuelo\n");
     printf("9. Ver vuelos\n");
-    printf("10. Crear pasajero\n");
-    printf("11. Eliminar pasajero\n");
-    printf("12. Actualizar pasajero\n");
     printf("13. Ver pasajeros\n");
-    printf("14. Registrar equipaje\n");
-    printf("15. Eliminar equipaje\n");
     printf("16. Ver equipaje\n");
-    printf("17. Asignar pasajero a vuelo\n");
-    printf("18. Ver pasajeros por vuelo\n");
-    printf("19. Ver equipaje por pasajero\n");
     printf("20. Cambiar usuario\n");
     printf("21. Salir\n");
 }
@@ -132,24 +118,21 @@ int leerOpcion(int *op) {
 
 
 
+
 void accionCargarCSV(void) {
-    aeropuerto_cargar_csv(listaAeropuertos, &totalAeropuertos, configSistema.ruta_aeropuertos);
-    vuelo_cargar_csv(listaVuelos, &totalVuelos, configSistema.ruta_vuelos);
-    pasajero_cargar_csv(listaPasajeros, &totalPasajeros, configSistema.ruta_pasajeros);
-    equipaje_cargar_csv(listaEquipaje, &totalEquipaje, configSistema.ruta_equipajes);
 
-    printf("Datos cargados correctamente.\n");
+    int a = db_cargar_aeropuertos_csv(db, configSistema.ruta_aeropuertos);
+    int v = db_cargar_vuelos_csv(db, configSistema.ruta_vuelos);
+    int u = db_cargar_usuarios_csv(db, configSistema.ruta_pasajeros);
+    int e = db_cargar_equipajes_csv(db, configSistema.ruta_equipajes);
+
+    printf("Cargados en BD:\n");
+    printf("Aeropuertos: %d\n", a);
+    printf("Vuelos: %d\n", v);
+    printf("Usuarios: %d\n", u);
+    printf("Equipajes: %d\n", e);
 }
 
-
-void guardarTodo(void) {
-    aeropuerto_guardar_csv(listaAeropuertos, totalAeropuertos, configSistema.ruta_aeropuertos);
-    vuelo_guardar_csv(listaVuelos, totalVuelos, configSistema.ruta_vuelos);
-    pasajero_guardar_csv(listaPasajeros, totalPasajeros, configSistema.ruta_pasajeros);
-    equipaje_guardar_csv(listaEquipaje, totalEquipaje, configSistema.ruta_equipajes);
-
-    printf("Datos guardados correctamente.\n");
-}
 
 
 
@@ -157,29 +140,26 @@ void ejecutarMenuEmpleado(void) {
     int op;
     do {
         mostrarCabecera("MENU EMPLEADO");
-        printf("1. Ver vuelos\n2. Ver pasajeros\n3. Salir\n");
+        printf("1. Ver vuelos (BD)\n2. Salir\n");
 
         if (leerOpcion(&op) != 0) continue;
 
-        if (op == 1) vuelo_ver(listaVuelos, totalVuelos);
-        if (op == 2) pasajero_ver(listaPasajeros, totalPasajeros);
+        if (op == 1) db_vuelo_listar(db);
 
-        if (op != 3) pausarPantalla();
+        if (op != 2) pausarPantalla();
 
-    } while (op != 3);
+    } while (op != 2);
 }
-
-
 
 void ejecutarMenuPasajero(void) {
     int op;
     do {
         mostrarCabecera("MENU PASAJERO");
-        printf("1. Ver vuelos\n2. Salir\n");
+        printf("1. Ver vuelos (BD)\n2. Salir\n");
 
         if (leerOpcion(&op) != 0) continue;
 
-        if (op == 1) vuelo_ver(listaVuelos, totalVuelos);
+        if (op == 1) db_vuelo_listar(db);
 
         if (op != 2) pausarPantalla();
 
@@ -187,7 +167,9 @@ void ejecutarMenuPasajero(void) {
 }
 
 
+
 int main(void) {
+
     int rol;
     int opcion;
 
@@ -195,6 +177,17 @@ int main(void) {
         printf("Error cargando config\n");
         return 1;
     }
+
+
+    db = db_abrir("aeropuerto.db");
+    if (!db) {
+        printf("Error abriendo BD\n");
+        return 1;
+    }
+
+    db_activar_fk(db);
+    db_inicializar(db);
+
 
     while (1) {
 
@@ -207,6 +200,7 @@ int main(void) {
         }
 
         if (rol == ROL_ADMINISTRADOR) {
+
             do {
                 mostrarMenu();
 
@@ -214,20 +208,32 @@ int main(void) {
 
                 switch (opcion) {
 
-                    case 1: accionCargarCSV(); break;
+                    case 1:
+                        accionCargarCSV();
+                        break;
 
-                    case 5: aeropuerto_ver(listaAeropuertos, totalAeropuertos); break;
-                    case 9: vuelo_ver(listaVuelos, totalVuelos); break;
-                    case 13: pasajero_ver(listaPasajeros, totalPasajeros); break;
-                    case 16: equipaje_ver(listaEquipaje, totalEquipaje); break;
+                    case 5:
+                        db_aeropuerto_listar(db);
+                        break;
+
+                    case 9:
+                        db_vuelo_listar(db);
+                        break;
+
+                    case 13:
+                        db_usuario_listar(db);
+                        break;
+
+                    case 16:
+                        printf("Función equipaje BD pendiente\n");
+                        break;
 
                     case 20:
-                        guardarTodo();
                         break;
 
                     case 21:
                         if (confirmarAccion("¿Salir del programa?")) {
-                            guardarTodo();
+                            db_cerrar(db);
                             return 0;
                         }
                         break;
@@ -250,5 +256,6 @@ int main(void) {
         }
     }
 
+    db_cerrar(db);
     return 0;
 }
