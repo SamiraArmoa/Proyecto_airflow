@@ -47,9 +47,12 @@ int cargarConfig(const char *ruta, Config *cfg) {
                 strcpy(cfg->ruta_pasajeros, valor);
             else if (strcmp(clave, "ruta_equipajes") == 0)
                 strcpy(cfg->ruta_equipajes, valor);
+            else if (strcmp(clave, "ruta_db") == 0)
+                strcpy(cfg->ruta_db, valor);
         }
     }
 
     fclose(f);
     return 0;
 }
+

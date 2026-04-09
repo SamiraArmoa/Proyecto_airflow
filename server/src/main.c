@@ -3,10 +3,6 @@
 #include <string.h>
 
 #include "usuario/usuario.h"
-#include "aeropuerto/aeropuerto.h"
-#include "vuelo/vuelo.h"
-#include "pasajero/pasajero.h"
-#include "equipaje/equipaje.h"
 #include "config/config.h"
 #include "../data/db/db.h"
 
@@ -24,19 +20,6 @@ static Config configSistema;
 
 
 static void *db = NULL;
-
-static Aeropuerto listaAeropuertos[MAX_AEROPUERTOS];
-static int totalAeropuertos = 0;
-
-static Vuelo listaVuelos[MAX_VUELOS];
-static int totalVuelos = 0;
-
-static Pasajero listaPasajeros[MAX_PASAJEROS];
-static int totalPasajeros = 0;
-
-static Equipaje listaEquipaje[MAX_EQUIPAJES];
-static int totalEquipaje = 0;
-
 
 
 void pausarPantalla(void) {
@@ -71,31 +54,27 @@ void mostrarCabecera(const char *t) {
 
 
 
-
-int loginSistema(void) {
+int loginSistema(const Config *cfg) {
     char usuario[100];
     char password[100];
 
     mostrarCabecera("LOGIN");
-
     printf("Usuario: ");
     if (leerCadena(usuario, sizeof(usuario)) != 0) return ROL_INVALIDO;
-
     printf("Password: ");
     if (leerCadena(password, sizeof(password)) != 0) return ROL_INVALIDO;
 
-    if (strcmp(usuario, "admin") == 0 && strcmp(password, "admin") == 0)
-        return ROL_ADMINISTRADOR;
+    if (strcmp(usuario, cfg->admin_user)    == 0 &&
+        strcmp(password, cfg->admin_pass)   == 0) return ROL_ADMINISTRADOR;
 
-    if (strcmp(usuario, "empleado") == 0 && strcmp(password, "empleado") == 0)
-        return ROL_EMPLEADO;
+    if (strcmp(usuario, cfg->empleado_user) == 0 &&
+        strcmp(password, cfg->empleado_pass)== 0) return ROL_EMPLEADO;
 
-    if (strcmp(usuario, "pasajero") == 0 && strcmp(password, "pasajero") == 0)
-        return ROL_PASAJERO;
+    if (strcmp(usuario, cfg->pasajero_user) == 0 &&
+        strcmp(password, cfg->pasajero_pass)== 0) return ROL_PASAJERO;
 
     return ROL_INVALIDO;
 }
-
 
 
 
@@ -178,8 +157,11 @@ int main(void) {
         return 1;
     }
 
+    printf("[DEBUG] admin_user='%s' admin_pass='%s'\n",
+           configSistema.admin_user, configSistema.admin_pass);
+    printf("[DEBUG] ruta_db='%s'\n", configSistema.ruta_db);
 
-    db = db_abrir("aeropuerto.db");
+    db = db_abrir(configSistema.ruta_db);
     if (!db) {
         printf("Error abriendo BD\n");
         return 1;
@@ -191,7 +173,7 @@ int main(void) {
 
     while (1) {
 
-        rol = loginSistema();
+        rol = loginSistema(&configSistema);
 
         if (rol == ROL_INVALIDO) {
             printf("Login incorrecto\n");
@@ -225,7 +207,7 @@ int main(void) {
                         break;
 
                     case 16:
-                        printf("Función equipaje BD pendiente\n");
+                    	db_equipaje_listar(db);
                         break;
 
                     case 20:

@@ -1,3 +1,4 @@
+ruta_db=..\data\db\airflow.db
 admin_user=admin
 admin_pass=1234
 empleado_user=empleado
