@@ -3,6 +3,8 @@
 #include <string>
 #include <cstring>
 #include <ctime>
+#include <vector>
+#include <sstream>
 
 #include <winsock2.h>
 #include <windows.h>
@@ -18,6 +20,18 @@ extern "C" {
 
 static Config configSistema;
 static void *db = NULL;
+
+std::vector<std::string> dividir(const std::string &texto, char separador) {
+    std::vector<std::string> partes;
+    std::stringstream ss(texto);
+    std::string item;
+
+    while (std::getline(ss, item, separador)) {
+        partes.push_back(item);
+    }
+
+    return partes;
+}
 
 void escribirLog(const std::string &mensaje) {
     std::ofstream log(configSistema.ruta_log, std::ios::app);
@@ -41,8 +55,42 @@ void enviarRespuesta(SOCKET cliente, const std::string &respuesta) {
     send(cliente, respuesta.c_str(), (int)respuesta.length(), 0);
 }
 
+std::string procesarLogin(const std::string &peticion) {
+    std::vector<std::string> partes = dividir(peticion, '|');
+
+    if (partes.size() != 3) {
+        escribirLog("Intento de login con formato incorrecto");
+        return "ERROR|Formato login incorrecto";
+    }
+
+    std::string usuario = partes[1];
+    std::string password = partes[2];
+
+    if (usuario == configSistema.admin_user && password == configSistema.admin_pass) {
+        escribirLog("Login correcto: ADMIN");
+        return "ROL|ADMIN";
+    }
+
+    if (usuario == configSistema.empleado_user && password == configSistema.empleado_pass) {
+        escribirLog("Login correcto: EMPLEADO");
+        return "ROL|EMPLEADO";
+    }
+
+    if (usuario == configSistema.pasajero_user && password == configSistema.pasajero_pass) {
+        escribirLog("Login correcto: PASAJERO");
+        return "ROL|PASAJERO";
+    }
+
+    escribirLog("Login incorrecto para usuario: " + usuario);
+    return "ERROR|Login incorrecto";
+}
+
 std::string procesarPeticion(const std::string &peticion) {
     escribirLog("Peticion recibida: " + peticion);
+
+    if (peticion.rfind("LOGIN|", 0) == 0) {
+        return procesarLogin(peticion);
+    }
 
     if (peticion == "LISTAR_AEROPUERTOS") {
         char *texto = db_aeropuerto_listar_texto(db);
