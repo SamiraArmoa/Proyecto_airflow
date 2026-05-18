@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "config.h"
 
 static void quitarSalto(char *s) {
-    s[strcspn(s, "\n")] = 0;
+    s[strcspn(s, "\r\n")] = 0;
 }
 
 int cargarConfig(const char *ruta, Config *cfg) {
-    FILE *f = fopen(ruta, "r");
+    FILE *f;
     char linea[300];
     char clave[100];
     char valor[200];
@@ -15,6 +16,13 @@ int cargarConfig(const char *ruta, Config *cfg) {
     if (cfg == NULL) {
         return -1;
     }
+
+    memset(cfg, 0, sizeof(Config));
+
+    cfg->puerto_servidor = 5000;
+    strcpy(cfg->ruta_log, "data/logs/servidor.log");
+
+    f = fopen(ruta, "r");
 
     if (!f) {
         printf("No se pudo abrir config\n");
@@ -25,8 +33,11 @@ int cargarConfig(const char *ruta, Config *cfg) {
         quitarSalto(linea);
 
         if (linea[0] == '\0') continue;
+        if (linea[0] == '#') continue;
 
-        if (sscanf(linea, "%99[^=]=%199s", clave, valor) == 2) {
+        if (sscanf(linea, "%99[^=]=%199[^\n]", clave, valor) == 2) {
+            quitarSalto(valor);
+
             if (strcmp(clave, "admin_user") == 0)
                 strcpy(cfg->admin_user, valor);
             else if (strcmp(clave, "admin_pass") == 0)
@@ -49,10 +60,13 @@ int cargarConfig(const char *ruta, Config *cfg) {
                 strcpy(cfg->ruta_equipajes, valor);
             else if (strcmp(clave, "ruta_db") == 0)
                 strcpy(cfg->ruta_db, valor);
+            else if (strcmp(clave, "ruta_log") == 0)
+                strcpy(cfg->ruta_log, valor);
+            else if (strcmp(clave, "puerto_servidor") == 0)
+                cfg->puerto_servidor = atoi(valor);
         }
     }
 
     fclose(f);
     return 0;
 }
-

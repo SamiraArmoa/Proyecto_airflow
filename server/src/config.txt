@@ -1,4 +1,4 @@
-ruta_db=..\data\db\airflow.db
+ruta_db=data/db/airflow.db
 admin_user=admin
 admin_pass=1234
 empleado_user=empleado
@@ -9,3 +9,5 @@ ruta_aeropuertos=csv/aeropuertos_grandes.csv
 ruta_vuelos=csv/vuelos_grandes.csv
 ruta_pasajeros=csv/pasajeros_grandes.csv
 ruta_equipajes=csv/equipajes_grandes.csv
+ruta_log=data/logs/servidor.log
+puerto_servidor=5000

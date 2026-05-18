@@ -1,12 +1,9 @@
-/*
- * vuelo.h
- *
- *  Created on: 2 abr 2026
- *      Author: oier.artabe
- */
-
 #ifndef SERVER_SRC_VUELO_VUELO_H_
 #define SERVER_SRC_VUELO_VUELO_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define MAX_VUELOS       500
 #define MAX_ID_VUELO     20
@@ -44,9 +41,15 @@ void vuelo_ver(const Vuelo lista[], int total);
 int vuelo_buscar(const Vuelo lista[], int total, const char *id);
 
 int vuelo_reservar_asiento(Vuelo lista[], int total, const char *id);
+
 int vuelo_liberar_asiento(Vuelo lista[], int total, const char *id);
 
 int vuelo_cargar_csv(Vuelo lista[], int *total, const char *ruta);
+
 int vuelo_guardar_csv(const Vuelo lista[], int total, const char *ruta);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SERVER_SRC_VUELO_VUELO_H_ */

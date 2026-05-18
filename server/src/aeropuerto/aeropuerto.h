@@ -1,12 +1,9 @@
-/*
- * aeropuerto.h
- *
- *  Created on: 2 abr 2026
- *      Author: oier.artabe
- */
-
 #ifndef SERVER_SRC_AEROPUERTO_AEROPUERTO_H_
 #define SERVER_SRC_AEROPUERTO_AEROPUERTO_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define MAX_AEROPUERTOS 100
 #define MAX_CODIGO      10
@@ -22,30 +19,32 @@ typedef struct {
     int  num_pistas;
 } Aeropuerto;
 
+int aeropuerto_crear(Aeropuerto lista[], int *total,
+                     const char *codigo, const char *nombre,
+                     const char *ciudad, const char *pais,
+                     int num_pistas);
 
-int  aeropuerto_crear(Aeropuerto lista[], int *total,
-                      const char *codigo, const char *nombre,
-                      const char *ciudad, const char *pais,
-                      int num_pistas);
+int aeropuerto_eliminar(Aeropuerto lista[], int *total,
+                        const char *codigo);
 
-int  aeropuerto_eliminar(Aeropuerto lista[], int *total,
-                         const char *codigo);
-
-int  aeropuerto_actualizar(Aeropuerto lista[], int total,
-                           const char *codigo, const char *nuevo_nombre,
-                           const char *nueva_ciudad, const char *nuevo_pais,
-                           int nuevo_num_pistas);
+int aeropuerto_actualizar(Aeropuerto lista[], int total,
+                          const char *codigo, const char *nuevo_nombre,
+                          const char *nueva_ciudad, const char *nuevo_pais,
+                          int nuevo_num_pistas);
 
 void aeropuerto_ver(const Aeropuerto lista[], int total);
 
+int aeropuerto_buscar(const Aeropuerto lista[], int total,
+                      const char *codigo);
 
-int  aeropuerto_buscar(const Aeropuerto lista[], int total,
-                       const char *codigo);
+int aeropuerto_cargar_csv(Aeropuerto lista[], int *total,
+                          const char *ruta);
 
-
-int  aeropuerto_cargar_csv(Aeropuerto lista[], int *total,
+int aeropuerto_guardar_csv(const Aeropuerto lista[], int total,
                            const char *ruta);
-int  aeropuerto_guardar_csv(const Aeropuerto lista[], int total,
-                            const char *ruta);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SERVER_SRC_AEROPUERTO_AEROPUERTO_H_ */

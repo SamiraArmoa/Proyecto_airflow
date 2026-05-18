@@ -1,12 +1,9 @@
-/*
- * cliente.h
- *
- *  Created on: 1 abr 2026
- *      Author: s.armoa
- */
-
 #ifndef SERVER_SRC_USUARIO_USUARIO_H_
 #define SERVER_SRC_USUARIO_USUARIO_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct {
     int id;
@@ -19,6 +16,9 @@ typedef struct {
 int crearUsuario();
 int eliminarUsuario();
 int actualizarUsuario();
-//int imprimirUsuarios();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SERVER_SRC_USUARIO_USUARIO_H_ */

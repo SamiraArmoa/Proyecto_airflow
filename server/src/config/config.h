@@ -1,7 +1,12 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
+
     char admin_user[50];
     char admin_pass[50];
 
@@ -17,9 +22,18 @@ typedef struct {
     char ruta_equipajes[200];
 
     char ruta_db[200];
+
+    // NUEVO HITO 3
+    char ruta_log[200];
+    int puerto_servidor;
+
 } Config;
 
 int cargarConfig(const char *ruta, Config *cfg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
@@ -27,9 +41,15 @@ int cargarConfig(const char *ruta, Config *cfg);
 /*
 #ifndef SERVER_CONFIG_H_
 #define SERVER_CONFIG_H_
+
 #define CLIENT_DB_PATH "../data/db/airflow.db"
+
 #define CSV_PATH_AEROPUERTOS "data/csv/aeropuertos.csv"
 #define CSV_PATH_VUELOS "data/csv/vuelos.csv"
+
 //#define CSV_PATH_EQUIPAJES "data/csv/equipajes.csv"
+
 #define LOGS_PATH_ "data/logs/error.log"
-#endif /* SERVER_CONFIG_H_ */
+
+#endif
+*/

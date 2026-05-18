@@ -32,7 +32,7 @@ int crearUsuario() {
 	printf("Email: ");
 	fflush(stdin);
 	fgets(em, 100, stdin);
-	nom[strcspn(em, "\n")] = '\0';
+	em[strcspn(em, "\n")] = '\0';
 
 	email = (char *)malloc((strlen(em) + 1) * sizeof(char));
 	if (email == NULL) {
