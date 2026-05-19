@@ -5,8 +5,8 @@
  *      Author: oier.artabe
  */
 
-#ifndef CLIENT_SRC_PASAJERO_VUELO_H_
-#define CLIENT_SRC_PASAJERO_VUELO_H_
+#ifndef CLIENT_SRC_VUELO_VUELO_H_
+#define CLIENT_SRC_VUELO_VUELO_H_
 
 
 

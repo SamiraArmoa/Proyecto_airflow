@@ -78,3 +78,33 @@
 [2026-05-19 10:39:55] Peticion recibida: SALIR
 [2026-05-19 10:39:55] Conexion con cliente cerrada
 [2026-05-19 10:39:55] Esperando cliente
+[2026-05-19 20:06:50] Servidor iniciado
+[2026-05-19 20:06:50] Base de datos abierta correctamente
+[2026-05-19 20:06:50] Servidor escuchando en puerto 5000
+[2026-05-19 20:06:50] Esperando cliente
+[2026-05-19 20:07:03] Cliente conectado
+[2026-05-19 20:07:33] Peticion recibida: LOGIN|admin|1234
+[2026-05-19 20:07:33] Login correcto: ADMIN
+[2026-05-19 20:07:37] Peticion recibida: CARGAR_CSV
+[2026-05-19 20:07:39] Peticion recibida: LISTAR_AEROPUERTOS
+[2026-05-19 20:07:41] Peticion recibida: LISTAR_VUELOS
+[2026-05-19 20:07:42] Peticion recibida: LISTAR_USUARIOS
+[2026-05-19 20:07:44] Peticion recibida: LISTAR_EQUIPAJES
+[2026-05-19 20:07:49] Peticion recibida: BUSCAR_VUELO|V100
+[2026-05-19 20:08:00] Peticion recibida: LOGIN|empleado|abcd
+[2026-05-19 20:08:00] Login correcto: EMPLEADO
+[2026-05-19 20:08:27] Peticion recibida: BUSCAR_VUELO|V114
+[2026-05-19 20:08:39] Peticion recibida: LOGIN|pasajero|1111
+[2026-05-19 20:08:39] Login correcto: PASAJERO
+[2026-05-19 20:08:48] Peticion recibida: BUSCAR_VUELO|V112
+[2026-05-19 20:08:54] Peticion recibida: LOGIN||
+[2026-05-19 20:08:54] Intento de login con formato incorrecto
+[2026-05-19 20:08:57] Peticion recibida: LOGIN|2334|24324
+[2026-05-19 20:08:57] Login incorrecto para usuario: 2334
+[2026-05-19 20:09:05] Peticion recibida: LOGIN|pasajero|1112
+[2026-05-19 20:09:05] Login incorrecto para usuario: pasajero
+[2026-05-19 20:09:10] Peticion recibida: LOGIN|pasajero|1111
+[2026-05-19 20:09:10] Login correcto: PASAJERO
+[2026-05-19 20:09:11] Peticion recibida: SALIR
+[2026-05-19 20:09:11] Conexion con cliente cerrada
+[2026-05-19 20:09:11] Esperando cliente

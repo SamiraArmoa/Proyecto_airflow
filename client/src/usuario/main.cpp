@@ -6,3 +6,16 @@
  */
 
 
+#include "controlador.h"
+
+int main() {
+    Controlador controlador;
+
+    if (!controlador.iniciar()) {
+        return 1;
+    }
+
+    controlador.ejecutar();
+
+    return 0;
+}
