@@ -29,3 +29,52 @@
 [2026-05-18 20:56:25] Login correcto: PASAJERO
 [2026-05-18 20:57:35] Peticion recibida: SALIR
 [2026-05-18 20:57:35] Servidor cerrado
+[2026-05-18 21:08:59] Servidor iniciado
+[2026-05-18 21:08:59] Base de datos abierta correctamente
+[2026-05-18 21:08:59] Servidor escuchando en puerto 5000
+[2026-05-18 21:08:59] Esperando cliente
+[2026-05-18 21:09:13] Cliente conectado
+[2026-05-18 21:09:25] Peticion recibida: LOGIN|admin|1234
+[2026-05-18 21:09:25] Login correcto: ADMIN
+[2026-05-18 21:09:42] Peticion recibida: LOGIN|empleado|abcd
+[2026-05-18 21:09:42] Login correcto: EMPLEADO
+[2026-05-18 21:09:52] Peticion recibida: LOGIN|pasajero|1111
+[2026-05-18 21:09:52] Login correcto: PASAJERO
+[2026-05-18 21:09:56] Peticion recibida: SALIR
+[2026-05-18 21:09:56] Conexion con cliente cerrada
+[2026-05-18 21:09:56] Esperando cliente
+[2026-05-18 21:10:01] Cliente conectado
+[2026-05-18 21:10:06] Peticion recibida: LOGIN|admin|1234
+[2026-05-18 21:10:06] Login correcto: ADMIN
+[2026-05-18 21:10:15] Peticion recibida: LOGIN|as|f
+[2026-05-18 21:10:15] Login incorrecto para usuario: as
+[2026-05-18 21:10:21] Peticion recibida: LOGIN|3535|465456
+[2026-05-18 21:10:21] Login incorrecto para usuario: 3535
+[2026-05-18 21:10:23] Peticion recibida: LOGIN||
+[2026-05-18 21:10:23] Intento de login con formato incorrecto
+[2026-05-18 21:10:29] Peticion recibida: LOGIN||
+[2026-05-18 21:10:29] Intento de login con formato incorrecto
+[2026-05-18 21:10:34] Peticion recibida: LOGIN|admin|1234
+[2026-05-18 21:10:34] Login correcto: ADMIN
+[2026-05-18 21:10:36] Peticion recibida: SALIR
+[2026-05-18 21:10:36] Conexion con cliente cerrada
+[2026-05-18 21:10:36] Esperando cliente
+[2026-05-19 10:38:23] Servidor iniciado
+[2026-05-19 10:38:23] Base de datos abierta correctamente
+[2026-05-19 10:38:23] Servidor escuchando en puerto 5000
+[2026-05-19 10:38:23] Esperando cliente
+[2026-05-19 10:38:32] Cliente conectado
+[2026-05-19 10:38:43] Peticion recibida: LOGIN|admin|1234
+[2026-05-19 10:38:43] Login correcto: ADMIN
+[2026-05-19 10:38:46] Peticion recibida: LISTAR_AEROPUERTOS
+[2026-05-19 10:38:52] Peticion recibida: LISTAR_VUELOS
+[2026-05-19 10:39:01] Peticion recibida: BUSCAR_VUELO|V114
+[2026-05-19 10:39:18] Peticion recibida: LOGIN|empleado|abcd
+[2026-05-19 10:39:18] Login correcto: EMPLEADO
+[2026-05-19 10:39:25] Peticion recibida: BUSCAR_VUELO|V117
+[2026-05-19 10:39:35] Peticion recibida: LOGIN|pasajero|1111
+[2026-05-19 10:39:35] Login correcto: PASAJERO
+[2026-05-19 10:39:47] Peticion recibida: BUSCAR_VUELO|V100
+[2026-05-19 10:39:55] Peticion recibida: SALIR
+[2026-05-19 10:39:55] Conexion con cliente cerrada
+[2026-05-19 10:39:55] Esperando cliente

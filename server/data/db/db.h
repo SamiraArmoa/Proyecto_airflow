@@ -181,6 +181,8 @@ char *db_usuario_listar_texto(void *db);
 
 char *db_equipaje_listar_texto(void *db);
 
+char *db_vuelo_buscar_codigo_texto(void *db, const char *codigo);
+
 #ifdef __cplusplus
 }
 #endif

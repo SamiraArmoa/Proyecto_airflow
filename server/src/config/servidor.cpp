@@ -101,7 +101,7 @@ std::string procesarPeticion(const std::string &peticion) {
 
         std::string respuesta = texto;
         free(texto);
-        return respuesta;
+        return "DATA|" + respuesta;
     }
 
     if (peticion == "LISTAR_VUELOS") {
@@ -113,7 +113,7 @@ std::string procesarPeticion(const std::string &peticion) {
 
         std::string respuesta = texto;
         free(texto);
-        return respuesta;
+        return "DATA|" + respuesta;
     }
 
     if (peticion == "LISTAR_USUARIOS") {
@@ -125,7 +125,7 @@ std::string procesarPeticion(const std::string &peticion) {
 
         std::string respuesta = texto;
         free(texto);
-        return respuesta;
+        return "DATA|" + respuesta;
     }
 
     if (peticion == "LISTAR_EQUIPAJES") {
@@ -137,7 +137,30 @@ std::string procesarPeticion(const std::string &peticion) {
 
         std::string respuesta = texto;
         free(texto);
-        return respuesta;
+        return "DATA|" + respuesta;
+    }
+
+    if (peticion.rfind("BUSCAR_VUELO|", 0) == 0) {
+        std::vector<std::string> partes = dividir(peticion, '|');
+
+        if (partes.size() != 2) {
+            return "ERROR|Formato incorrecto. Uso: BUSCAR_VUELO|codigo";
+        }
+
+        char *texto = db_vuelo_buscar_codigo_texto(db, partes[1].c_str());
+
+        if (!texto) {
+            return "ERROR|No se pudo buscar el vuelo";
+        }
+
+        std::string respuesta = texto;
+        free(texto);
+
+        if (respuesta.rfind("ERROR|", 0) == 0) {
+            return respuesta;
+        }
+
+        return "DATA|" + respuesta;
     }
 
     if (peticion == "CARGAR_CSV") {
@@ -228,53 +251,59 @@ int main() {
     std::cout << "Servidor escuchando en puerto " << configSistema.puerto_servidor << "...\n";
     escribirLog("Servidor escuchando en puerto " + std::to_string(configSistema.puerto_servidor));
 
-    socketCliente = accept(socketServidor, (sockaddr *)&clienteAddr, &clienteTam);
+    while (true) {
+        std::cout << "Esperando cliente...\n";
+        escribirLog("Esperando cliente");
 
-    if (socketCliente == INVALID_SOCKET) {
-        std::cout << "Error aceptando cliente\n";
-        closesocket(socketServidor);
-        WSACleanup();
-        db_cerrar(db);
-        return 1;
-    }
+        clienteTam = sizeof(clienteAddr);
+        socketCliente = accept(socketServidor, (sockaddr *)&clienteAddr, &clienteTam);
 
-    std::cout << "Cliente conectado\n";
-    escribirLog("Cliente conectado");
-
-    bool salir = false;
-
-    while (!salir) {
-        memset(buffer, 0, sizeof(buffer));
-
-        int bytesRecibidos = recv(socketCliente, buffer, sizeof(buffer) - 1, 0);
-
-        if (bytesRecibidos <= 0) {
-            std::cout << "Cliente desconectado\n";
-            escribirLog("Cliente desconectado");
-            break;
+        if (socketCliente == INVALID_SOCKET) {
+            std::cout << "Error aceptando cliente\n";
+            escribirLog("Error aceptando cliente");
+            continue;
         }
 
-        buffer[bytesRecibidos] = '\0';
+        std::cout << "Cliente conectado\n";
+        escribirLog("Cliente conectado");
 
-        std::string peticion(buffer);
+        bool salirCliente = false;
 
-        if (peticion == "SALIR") {
-            salir = true;
+        while (!salirCliente) {
+            memset(buffer, 0, sizeof(buffer));
+
+            int bytesRecibidos = recv(socketCliente, buffer, sizeof(buffer) - 1, 0);
+
+            if (bytesRecibidos <= 0) {
+                std::cout << "Cliente desconectado\n";
+                escribirLog("Cliente desconectado");
+                break;
+            }
+
+            buffer[bytesRecibidos] = '\0';
+
+            std::string peticion(buffer);
+
+            if (peticion == "SALIR") {
+                salirCliente = true;
+            }
+
+            std::string respuesta = procesarPeticion(peticion);
+            enviarRespuesta(socketCliente, respuesta);
         }
 
-        std::string respuesta = procesarPeticion(peticion);
-        enviarRespuesta(socketCliente, respuesta);
+        closesocket(socketCliente);
+
+        std::cout << "Conexion con cliente cerrada\n";
+        escribirLog("Conexion con cliente cerrada");
     }
 
-    closesocket(socketCliente);
     closesocket(socketServidor);
     WSACleanup();
 
     db_cerrar(db);
 
     escribirLog("Servidor cerrado");
-
-    std::cout << "Servidor cerrado\n";
 
     return 0;
 }

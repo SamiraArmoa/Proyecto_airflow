@@ -27,10 +27,39 @@ std::string enviarPeticion(SOCKET socketCliente, const std::string &peticion) {
     return std::string(buffer);
 }
 
+std::string extraerContenido(const std::string &respuesta) {
+    if (respuesta.rfind("DATA|", 0) == 0) {
+        return respuesta.substr(5);
+    }
+
+    if (respuesta.rfind("OK|", 0) == 0) {
+        return respuesta.substr(3);
+    }
+
+    return respuesta;
+}
+
 void pausar() {
     std::cout << "\nPulsa ENTER para continuar...";
     std::cin.ignore();
     std::cin.get();
+}
+
+void buscarVueloPorCodigo(SOCKET socketCliente) {
+    std::string codigo;
+
+    std::cout << "\nCodigo del vuelo: ";
+    std::getline(std::cin, codigo);
+
+    if (codigo.empty()) {
+        std::cout << "Codigo vacio\n";
+        pausar();
+        return;
+    }
+
+    std::string respuesta = enviarPeticion(socketCliente, "BUSCAR_VUELO|" + codigo);
+    std::cout << "\n" << extraerContenido(respuesta) << "\n";
+    pausar();
 }
 
 std::string hacerLogin(SOCKET socketCliente) {
@@ -80,8 +109,9 @@ void mostrarMenuAdmin() {
     std::cout << "3. Ver vuelos\n";
     std::cout << "4. Ver pasajeros\n";
     std::cout << "5. Ver equipajes\n";
-    std::cout << "6. Cambiar usuario\n";
-    std::cout << "7. Salir\n";
+    std::cout << "6. Buscar vuelo por codigo\n";
+    std::cout << "7. Cambiar usuario\n";
+    std::cout << "8. Salir\n";
     std::cout << "\nOpcion: ";
 }
 
@@ -93,8 +123,9 @@ void mostrarMenuEmpleado() {
     std::cout << "2. Ver vuelos\n";
     std::cout << "3. Ver pasajeros\n";
     std::cout << "4. Ver equipajes\n";
-    std::cout << "5. Cambiar usuario\n";
-    std::cout << "6. Salir\n";
+    std::cout << "5. Buscar vuelo por codigo\n";
+    std::cout << "6. Cambiar usuario\n";
+    std::cout << "7. Salir\n";
     std::cout << "\nOpcion: ";
 }
 
@@ -104,8 +135,9 @@ void mostrarMenuPasajero() {
     std::cout << "==============================\n";
     std::cout << "1. Ver vuelos\n";
     std::cout << "2. Ver equipajes\n";
-    std::cout << "3. Cambiar usuario\n";
-    std::cout << "4. Salir\n";
+    std::cout << "3. Buscar vuelo por codigo\n";
+    std::cout << "4. Cambiar usuario\n";
+    std::cout << "5. Salir\n";
     std::cout << "\nOpcion: ";
 }
 
@@ -140,7 +172,7 @@ void ejecutarMenuAdmin(SOCKET socketCliente,
         switch (opcion) {
             case 1: {
                 std::string respuesta = enviarPeticion(socketCliente, "CARGAR_CSV");
-                std::cout << "\n" << respuesta << "\n";
+                std::cout << "\n" << extraerContenido(respuesta) << "\n";
 
                 invalidarCache(cacheAeropuertosValida,
                                cacheVuelosValida,
@@ -153,7 +185,7 @@ void ejecutarMenuAdmin(SOCKET socketCliente,
 
             case 2: {
                 if (!cacheAeropuertosValida) {
-                    cacheAeropuertos = enviarPeticion(socketCliente, "LISTAR_AEROPUERTOS");
+                    cacheAeropuertos = extraerContenido(enviarPeticion(socketCliente, "LISTAR_AEROPUERTOS"));
                     cacheAeropuertosValida = true;
                 }
 
@@ -164,7 +196,7 @@ void ejecutarMenuAdmin(SOCKET socketCliente,
 
             case 3: {
                 if (!cacheVuelosValida) {
-                    cacheVuelos = enviarPeticion(socketCliente, "LISTAR_VUELOS");
+                    cacheVuelos = extraerContenido(enviarPeticion(socketCliente, "LISTAR_VUELOS"));
                     cacheVuelosValida = true;
                 }
 
@@ -175,7 +207,7 @@ void ejecutarMenuAdmin(SOCKET socketCliente,
 
             case 4: {
                 if (!cacheUsuariosValida) {
-                    cacheUsuarios = enviarPeticion(socketCliente, "LISTAR_USUARIOS");
+                    cacheUsuarios = extraerContenido(enviarPeticion(socketCliente, "LISTAR_USUARIOS"));
                     cacheUsuariosValida = true;
                 }
 
@@ -186,7 +218,7 @@ void ejecutarMenuAdmin(SOCKET socketCliente,
 
             case 5: {
                 if (!cacheEquipajesValida) {
-                    cacheEquipajes = enviarPeticion(socketCliente, "LISTAR_EQUIPAJES");
+                    cacheEquipajes = extraerContenido(enviarPeticion(socketCliente, "LISTAR_EQUIPAJES"));
                     cacheEquipajesValida = true;
                 }
 
@@ -196,12 +228,16 @@ void ejecutarMenuAdmin(SOCKET socketCliente,
             }
 
             case 6:
+                buscarVueloPorCodigo(socketCliente);
+                break;
+
+            case 7:
                 std::cout << "Cambiando usuario...\n";
                 break;
 
-            case 7: {
+            case 8: {
                 std::string respuesta = enviarPeticion(socketCliente, "SALIR");
-                std::cout << respuesta << "\n";
+                std::cout << extraerContenido(respuesta) << "\n";
                 salirPrograma = true;
                 break;
             }
@@ -212,7 +248,7 @@ void ejecutarMenuAdmin(SOCKET socketCliente,
                 break;
         }
 
-    } while (opcion != 6 && opcion != 7);
+    } while (opcion != 7 && opcion != 8);
 }
 
 void ejecutarMenuEmpleado(SOCKET socketCliente,
@@ -236,7 +272,7 @@ void ejecutarMenuEmpleado(SOCKET socketCliente,
         switch (opcion) {
             case 1: {
                 if (!cacheAeropuertosValida) {
-                    cacheAeropuertos = enviarPeticion(socketCliente, "LISTAR_AEROPUERTOS");
+                    cacheAeropuertos = extraerContenido(enviarPeticion(socketCliente, "LISTAR_AEROPUERTOS"));
                     cacheAeropuertosValida = true;
                 }
 
@@ -247,7 +283,7 @@ void ejecutarMenuEmpleado(SOCKET socketCliente,
 
             case 2: {
                 if (!cacheVuelosValida) {
-                    cacheVuelos = enviarPeticion(socketCliente, "LISTAR_VUELOS");
+                    cacheVuelos = extraerContenido(enviarPeticion(socketCliente, "LISTAR_VUELOS"));
                     cacheVuelosValida = true;
                 }
 
@@ -258,7 +294,7 @@ void ejecutarMenuEmpleado(SOCKET socketCliente,
 
             case 3: {
                 if (!cacheUsuariosValida) {
-                    cacheUsuarios = enviarPeticion(socketCliente, "LISTAR_USUARIOS");
+                    cacheUsuarios = extraerContenido(enviarPeticion(socketCliente, "LISTAR_USUARIOS"));
                     cacheUsuariosValida = true;
                 }
 
@@ -269,7 +305,7 @@ void ejecutarMenuEmpleado(SOCKET socketCliente,
 
             case 4: {
                 if (!cacheEquipajesValida) {
-                    cacheEquipajes = enviarPeticion(socketCliente, "LISTAR_EQUIPAJES");
+                    cacheEquipajes = extraerContenido(enviarPeticion(socketCliente, "LISTAR_EQUIPAJES"));
                     cacheEquipajesValida = true;
                 }
 
@@ -279,12 +315,16 @@ void ejecutarMenuEmpleado(SOCKET socketCliente,
             }
 
             case 5:
+                buscarVueloPorCodigo(socketCliente);
+                break;
+
+            case 6:
                 std::cout << "Cambiando usuario...\n";
                 break;
 
-            case 6: {
+            case 7: {
                 std::string respuesta = enviarPeticion(socketCliente, "SALIR");
-                std::cout << respuesta << "\n";
+                std::cout << extraerContenido(respuesta) << "\n";
                 salirPrograma = true;
                 break;
             }
@@ -295,7 +335,7 @@ void ejecutarMenuEmpleado(SOCKET socketCliente,
                 break;
         }
 
-    } while (opcion != 5 && opcion != 6);
+    } while (opcion != 6 && opcion != 7);
 }
 
 void ejecutarMenuPasajero(SOCKET socketCliente,
@@ -315,7 +355,7 @@ void ejecutarMenuPasajero(SOCKET socketCliente,
         switch (opcion) {
             case 1: {
                 if (!cacheVuelosValida) {
-                    cacheVuelos = enviarPeticion(socketCliente, "LISTAR_VUELOS");
+                    cacheVuelos = extraerContenido(enviarPeticion(socketCliente, "LISTAR_VUELOS"));
                     cacheVuelosValida = true;
                 }
 
@@ -326,7 +366,7 @@ void ejecutarMenuPasajero(SOCKET socketCliente,
 
             case 2: {
                 if (!cacheEquipajesValida) {
-                    cacheEquipajes = enviarPeticion(socketCliente, "LISTAR_EQUIPAJES");
+                    cacheEquipajes = extraerContenido(enviarPeticion(socketCliente, "LISTAR_EQUIPAJES"));
                     cacheEquipajesValida = true;
                 }
 
@@ -336,12 +376,16 @@ void ejecutarMenuPasajero(SOCKET socketCliente,
             }
 
             case 3:
+                buscarVueloPorCodigo(socketCliente);
+                break;
+
+            case 4:
                 std::cout << "Cambiando usuario...\n";
                 break;
 
-            case 4: {
+            case 5: {
                 std::string respuesta = enviarPeticion(socketCliente, "SALIR");
-                std::cout << respuesta << "\n";
+                std::cout << extraerContenido(respuesta) << "\n";
                 salirPrograma = true;
                 break;
             }
@@ -352,7 +396,7 @@ void ejecutarMenuPasajero(SOCKET socketCliente,
                 break;
         }
 
-    } while (opcion != 3 && opcion != 4);
+    } while (opcion != 4 && opcion != 5);
 }
 
 int main() {

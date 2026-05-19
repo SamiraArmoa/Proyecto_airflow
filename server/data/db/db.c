@@ -562,3 +562,51 @@ char *db_equipaje_listar_texto(void *db) {
     sqlite3_finalize(stmt);
     return resultado;
 }
+
+/* BUSCAR VUELO PARA SOCKETS */
+
+char *db_vuelo_buscar_codigo_texto(void *db, const char *codigo) {
+    sqlite3_stmt *stmt;
+    char *resultado = (char *)malloc(4096);
+
+    if (!resultado) return NULL;
+
+    resultado[0] = '\0';
+
+    sqlite3_prepare_v2(DB(db),
+        "SELECT v.ID_VUELO, v.COD_VUELO, "
+        "a1.CODIGO, a2.CODIGO, "
+        "v.FECHA_HORA, v.PRECIO, v.CAPACIDAD "
+        "FROM Vuelo v "
+        "LEFT JOIN Aeropuerto a1 ON v.ID_ORIGEN = a1.ID_A "
+        "LEFT JOIN Aeropuerto a2 ON v.ID_DESTINO = a2.ID_A "
+        "WHERE v.COD_VUELO = ?",
+        -1, &stmt, NULL);
+
+    sqlite3_bind_text(stmt, 1, codigo, -1, SQLITE_TRANSIENT);
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        snprintf(resultado, 4096,
+            "\n=== VUELO ENCONTRADO ===\n"
+            "ID: %d\n"
+            "Codigo: %s\n"
+            "Origen: %s\n"
+            "Destino: %s\n"
+            "Fecha: %s\n"
+            "Precio: %.2f\n"
+            "Capacidad: %d\n",
+            sqlite3_column_int(stmt, 0),
+            sqlite3_column_text(stmt, 1),
+            sqlite3_column_text(stmt, 2),
+            sqlite3_column_text(stmt, 3),
+            sqlite3_column_text(stmt, 4),
+            sqlite3_column_double(stmt, 5),
+            sqlite3_column_int(stmt, 6));
+    }
+    else {
+        strcpy(resultado, "ERROR|Vuelo no encontrado");
+    }
+
+    sqlite3_finalize(stmt);
+    return resultado;
+}
