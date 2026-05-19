@@ -40,6 +40,8 @@ private:
 
     void buscarVueloPorCodigo();
 
+    void buscarVuelosOrigenDestino();
+
     void ejecutarMenuAdmin();
     void ejecutarMenuEmpleado();
     void ejecutarMenuPasajero();

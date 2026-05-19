@@ -163,6 +163,33 @@ std::string procesarPeticion(const std::string &peticion) {
         return "DATA|" + respuesta;
     }
 
+    if (peticion.rfind("BUSCAR_VUELOS_ORIGEN_DESTINO|", 0) == 0) {
+        std::vector<std::string> partes = dividir(peticion, '|');
+
+        if (partes.size() != 3) {
+            return "ERROR|Formato incorrecto. Uso: BUSCAR_VUELOS_ORIGEN_DESTINO|origen|destino";
+        }
+
+        char *texto = db_vuelos_buscar_origen_destino_texto(
+            db,
+            partes[1].c_str(),
+            partes[2].c_str()
+        );
+
+        if (!texto) {
+            return "ERROR|No se pudieron buscar vuelos por origen y destino";
+        }
+
+        std::string respuesta = texto;
+        free(texto);
+
+        if (respuesta.rfind("ERROR|", 0) == 0) {
+            return respuesta;
+        }
+
+        return "DATA|" + respuesta;
+    }
+
     if (peticion == "CARGAR_CSV") {
         int a = db_cargar_aeropuertos_csv(db, configSistema.ruta_aeropuertos);
         int v = db_cargar_vuelos_csv(db, configSistema.ruta_vuelos);

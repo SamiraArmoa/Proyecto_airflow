@@ -183,6 +183,8 @@ char *db_equipaje_listar_texto(void *db);
 
 char *db_vuelo_buscar_codigo_texto(void *db, const char *codigo);
 
+char *db_vuelos_buscar_origen_destino_texto(void *db, const char *origen, const char *destino);
+
 #ifdef __cplusplus
 }
 #endif

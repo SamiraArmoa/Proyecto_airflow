@@ -108,3 +108,29 @@
 [2026-05-19 20:09:11] Peticion recibida: SALIR
 [2026-05-19 20:09:11] Conexion con cliente cerrada
 [2026-05-19 20:09:11] Esperando cliente
+[2026-05-19 21:00:23] Servidor iniciado
+[2026-05-19 21:00:23] Base de datos abierta correctamente
+[2026-05-19 21:00:23] Servidor escuchando en puerto 5000
+[2026-05-19 21:00:23] Esperando cliente
+[2026-05-19 21:00:30] Cliente conectado
+[2026-05-19 21:00:39] Peticion recibida: LOGIN|admin|1234
+[2026-05-19 21:00:39] Login correcto: ADMIN
+[2026-05-19 21:00:42] Peticion recibida: CARGAR_CSV
+[2026-05-19 21:00:44] Peticion recibida: LISTAR_AEROPUERTOS
+[2026-05-19 21:00:45] Peticion recibida: LISTAR_VUELOS
+[2026-05-19 21:00:47] Peticion recibida: LISTAR_USUARIOS
+[2026-05-19 21:00:49] Peticion recibida: LISTAR_EQUIPAJES
+[2026-05-19 21:00:55] Peticion recibida: BUSCAR_VUELO|V100
+[2026-05-19 21:01:35] Peticion recibida: BUSCAR_VUELOS_ORIGEN_DESTINO|VIE|BRU
+[2026-05-19 21:02:01] Peticion recibida: LOGIN|empleado|abcd
+[2026-05-19 21:02:01] Login correcto: EMPLEADO
+[2026-05-19 21:02:13] Peticion recibida: BUSCAR_VUELO|V100
+[2026-05-19 21:02:21] Peticion recibida: BUSCAR_VUELOS_ORIGEN_DESTINO|VIE|BRU
+[2026-05-19 21:02:29] Peticion recibida: BUSCAR_VUELOS_ORIGEN_DESTINO|VIE|BRRF
+[2026-05-19 21:02:42] Peticion recibida: LOGIN|pasajero|1111
+[2026-05-19 21:02:42] Login correcto: PASAJERO
+[2026-05-19 21:02:49] Peticion recibida: BUSCAR_VUELO|V114
+[2026-05-19 21:02:57] Peticion recibida: BUSCAR_VUELOS_ORIGEN_DESTINO|VIE|BRU
+[2026-05-19 21:03:01] Peticion recibida: SALIR
+[2026-05-19 21:03:01] Conexion con cliente cerrada
+[2026-05-19 21:03:01] Esperando cliente
