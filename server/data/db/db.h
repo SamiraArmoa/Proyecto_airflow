@@ -185,6 +185,13 @@ char *db_vuelo_buscar_codigo_texto(void *db, const char *codigo);
 
 char *db_vuelos_buscar_origen_destino_texto(void *db, const char *origen, const char *destino);
 
+//Funciones billete
+int db_billete_listar_por_vuelo(void *db, int id_vuelo);
+
+char *db_comprar_billete_texto(void *db, int id_usuario, const char *cod_vuelo);
+
+int db_pasajeros_por_vuelo(void *db, int id_vuelo);
+
 #ifdef __cplusplus
 }
 #endif
