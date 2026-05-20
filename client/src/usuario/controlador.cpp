@@ -82,6 +82,36 @@ void Controlador::buscarVuelosOrigenDestino() {
     pausar();
 }
 
+void Controlador::comprarBillete() {
+    std::string cod_vuelo;
+
+    std::cout << "\nCodigo del vuelo que deseas comprar: ";
+    std::getline(std::cin, cod_vuelo);
+
+    if (cod_vuelo.empty()) {
+        std::cout << "Codigo vacio\n";
+        pausar();
+        return;
+    }
+
+    std::string info = cliente.enviarPeticion("BUSCAR_VUELO|" + cod_vuelo);
+    std::cout << "\n" << extraerContenido(info) << "\n";
+
+    std::cout << "Confirmas la compra? (s/n): ";
+    std::string confirmacion;
+    std::getline(std::cin, confirmacion);
+
+    if (confirmacion != "s" && confirmacion != "S") {
+        std::cout << "Compra cancelada.\n";
+        pausar();
+        return;
+    }
+
+    std::string respuesta = cliente.enviarPeticion("COMPRAR_BILLETE|" + cod_vuelo);
+    std::cout << "\n" << extraerContenido(respuesta) << "\n";
+    pausar();
+}
+
 std::string Controlador::hacerLogin() {
     std::string usuario;
     std::string password;
@@ -158,8 +188,9 @@ void Controlador::mostrarMenuPasajero() {
     std::cout << "2. Ver equipajes\n";
     std::cout << "3. Buscar vuelo por codigo\n";
     std::cout << "4. Buscar vuelos por origen y destino\n";
-    std::cout << "5. Cambiar usuario\n";
-    std::cout << "6. Salir\n";
+    std::cout << "5. Comprar billete\n";
+    std::cout << "6. Cambiar usuario\n";
+    std::cout << "7. Salir\n";
     std::cout << "\nOpcion: ";
 }
 
@@ -329,48 +360,53 @@ void Controlador::ejecutarMenuPasajero() {
         std::cin.ignore();
 
         switch (opcion) {
-            case 1:
-                if (!cacheVuelosValida) {
-                    cacheVuelos = extraerContenido(cliente.enviarPeticion("LISTAR_VUELOS"));
-                    cacheVuelosValida = true;
+                    case 1:
+                        if (!cacheVuelosValida) {
+                            cacheVuelos = extraerContenido(cliente.enviarPeticion("LISTAR_VUELOS"));
+                            cacheVuelosValida = true;
+                        }
+                        std::cout << cacheVuelos << "\n";
+                        pausar();
+                        break;
+
+                    case 2:
+                        if (!cacheEquipajesValida) {
+                            cacheEquipajes = extraerContenido(cliente.enviarPeticion("LISTAR_EQUIPAJES"));
+                            cacheEquipajesValida = true;
+                        }
+                        std::cout << cacheEquipajes << "\n";
+                        pausar();
+                        break;
+
+                    case 3:
+                        buscarVueloPorCodigo();
+                        break;
+
+                    case 4:
+                        buscarVuelosOrigenDestino();
+                        break;
+
+                    case 5:
+                        comprarBillete();
+                        break;
+
+                    case 6:
+                        std::cout << "Cambiando usuario...\n";
+                        break;
+
+                    case 7:
+                        std::cout << extraerContenido(cliente.enviarPeticion("SALIR")) << "\n";
+                        salirPrograma = true;
+                        break;
+
+                    default:
+                        std::cout << "Opcion no valida\n";
+                        pausar();
+                        break;
                 }
-                std::cout << cacheVuelos << "\n";
-                pausar();
-                break;
 
-            case 2:
-                if (!cacheEquipajesValida) {
-                    cacheEquipajes = extraerContenido(cliente.enviarPeticion("LISTAR_EQUIPAJES"));
-                    cacheEquipajesValida = true;
-                }
-                std::cout << cacheEquipajes << "\n";
-                pausar();
-                break;
 
-            case 3:
-                buscarVueloPorCodigo();
-                break;
-
-            case 4:
-                buscarVuelosOrigenDestino();
-                break;
-
-            case 5:
-                std::cout << "Cambiando usuario...\n";
-                break;
-
-            case 6:
-                std::cout << extraerContenido(cliente.enviarPeticion("SALIR")) << "\n";
-                salirPrograma = true;
-                break;
-
-            default:
-                std::cout << "Opcion no valida\n";
-                pausar();
-                break;
-        }
-
-    } while (opcion != 5 && opcion != 6);
+    } while (opcion != 6 && opcion != 7);
 }
 
 void Controlador::ejecutar() {
