@@ -20,6 +20,7 @@ extern "C" {
 
 static Config configSistema;
 static void *db = NULL;
+static int idUsuarioActual = -1;
 
 std::vector<std::string> dividir(const std::string &texto, char separador) {
     std::vector<std::string> partes;
@@ -67,19 +68,33 @@ std::string procesarLogin(const std::string &peticion) {
     std::string password = partes[2];
 
     if (usuario == configSistema.admin_user && password == configSistema.admin_pass) {
-        escribirLog("Login correcto: ADMIN");
-        return "ROL|ADMIN";
-    }
+            escribirLog("Login correcto: ADMIN");
+            idUsuarioActual = -1;
+            return "ROL|ADMIN";
+        }
 
-    if (usuario == configSistema.empleado_user && password == configSistema.empleado_pass) {
-        escribirLog("Login correcto: EMPLEADO");
-        return "ROL|EMPLEADO";
-    }
+        if (usuario == configSistema.empleado_user && password == configSistema.empleado_pass) {
+            escribirLog("Login correcto: EMPLEADO");
+            idUsuarioActual = -1;
+            return "ROL|EMPLEADO";
+        }
 
-    if (usuario == configSistema.pasajero_user && password == configSistema.pasajero_pass) {
-        escribirLog("Login correcto: PASAJERO");
-        return "ROL|PASAJERO";
-    }
+        if (usuario == configSistema.pasajero_user && password == configSistema.pasajero_pass) {
+            escribirLog("Login correcto: PASAJERO");
+            int id_encontrado = -1;
+            char nombre_buf[128];
+            long long tlf_buf;
+            char pass_buf[64];
+            int rol_buf;
+            if (db_usuario_buscar_email(db, usuario.c_str(),
+                                        &id_encontrado, nombre_buf,
+                                        &tlf_buf, pass_buf, &rol_buf) == 0) {
+                idUsuarioActual = id_encontrado;
+            } else {
+                idUsuarioActual = -1;
+            }
+            return "ROL|PASAJERO";
+        }
 
     escribirLog("Login incorrecto para usuario: " + usuario);
     return "ERROR|Login incorrecto";
@@ -208,6 +223,22 @@ std::string procesarPeticion(const std::string &peticion) {
     if (peticion == "SALIR") {
         return "OK|Cliente desconectado";
     }
+    if (peticion.rfind("COMPRAR_BILLETE|", 0) == 0) {
+            std::vector<std::string> partes = dividir(peticion, '|');
+            if (partes.size() != 2) {
+                return "ERROR|Formato incorrecto. Uso: COMPRAR_BILLETE|cod_vuelo";
+            }
+            if (idUsuarioActual == -1) {
+                return "ERROR|No hay usuario autenticado para comprar billete";
+            }
+            char *texto = db_comprar_billete_texto(db, idUsuarioActual, partes[1].c_str());
+            if (!texto) {
+                return "ERROR|Error interno al comprar billete";
+            }
+            std::string respuesta(texto);
+            free(texto);
+            return respuesta;
+        }
 
     return "ERROR|Peticion no reconocida";
 }
