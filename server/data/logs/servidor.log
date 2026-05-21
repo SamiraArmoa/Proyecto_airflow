@@ -134,3 +134,19 @@
 [2026-05-19 21:03:01] Peticion recibida: SALIR
 [2026-05-19 21:03:01] Conexion con cliente cerrada
 [2026-05-19 21:03:01] Esperando cliente
+[2026-05-21 11:19:13] Servidor iniciado
+[2026-05-21 11:19:13] Base de datos abierta correctamente
+[2026-05-21 11:19:13] Servidor escuchando en puerto 5000
+[2026-05-21 11:19:13] Esperando cliente
+[2026-05-21 11:19:19] Cliente conectado
+[2026-05-21 11:19:27] Peticion recibida: LOGIN|admin|1234
+[2026-05-21 11:19:27] Login correcto: ADMIN
+[2026-05-21 11:19:48] Peticion recibida: LOGIN|empleado|abcd
+[2026-05-21 11:19:48] Login correcto: EMPLEADO
+[2026-05-21 11:19:56] Peticion recibida: LOGIN|pasajero|1111
+[2026-05-21 11:19:56] Login correcto: PASAJERO
+[2026-05-21 11:20:02] Peticion recibida: BUSCAR_VUELO|V100
+[2026-05-21 11:20:06] Peticion recibida: COMPRAR_BILLETE|V100
+[2026-05-21 11:24:01] Peticion recibida: SALIR
+[2026-05-21 11:24:01] Conexion con cliente cerrada
+[2026-05-21 11:24:01] Esperando cliente

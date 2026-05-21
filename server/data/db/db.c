@@ -564,6 +564,8 @@ char *db_equipaje_listar_texto(void *db) {
 }
 
 
+/* BUSCAR VUELO PARA SOCKETS */
+
 char *db_vuelo_buscar_codigo_texto(void *db, const char *codigo) {
     sqlite3_stmt *stmt;
     char *resultado = (char *)malloc(4096);
@@ -666,157 +668,103 @@ char *db_vuelos_buscar_origen_destino_texto(void *db, const char *origen, const 
     return resultado;
 }
 
-int db_billete_insertar(void *db,
-                        int id_usuario,
-                        int id_vuelo,
-                        const char *asiento,
-                        const char *fecha_compra,
-                        int *id_out) {
+int db_usuario_buscar_email(void *db,
+                            const char *email,
+                            int *id_out,
+                            char *nombre_out,
+                            long long *tlf_out,
+                            char *contrasena_out,
+                            int *rol_out) {
     sqlite3_stmt *stmt;
 
-    const char *sql =
-        "INSERT INTO Billete(ID_USUARIO, ID_VUELO, ASIENTO, FECHA_COMPRA)"
-        " VALUES(?, ?, ?, ?)";
+    sqlite3_prepare_v2(DB(db),
+        "SELECT ID_US, NOMBRE, TLF, CONTRASENA, ROL "
+        "FROM Usuario WHERE EMAIL=?",
+        -1, &stmt, NULL);
 
-    if (sqlite3_prepare_v2(DB(db), sql, -1, &stmt, NULL) != SQLITE_OK) {
-        fprintf(stderr, "[DB] Error preparando INSERT Billete: %s\n",
-                sqlite3_errmsg(DB(db)));
-        return -1;
-    }
-
-    sqlite3_bind_int (stmt, 1, id_usuario);
-    sqlite3_bind_int (stmt, 2, id_vuelo);
-    sqlite3_bind_text(stmt, 3, asiento,      -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 4, fecha_compra, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 1, email, -1, SQLITE_TRANSIENT);
 
     int rc = -1;
-    if (sqlite3_step(stmt) == SQLITE_DONE) {
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
         if (id_out)
-            *id_out = (int)sqlite3_last_insert_rowid(DB(db));
+            *id_out = sqlite3_column_int(stmt, 0);
+
+        if (nombre_out)
+            strcpy(nombre_out, (const char *)sqlite3_column_text(stmt, 1));
+
+        if (tlf_out)
+            *tlf_out = sqlite3_column_int64(stmt, 2);
+
+        if (contrasena_out)
+            strcpy(contrasena_out, (const char *)sqlite3_column_text(stmt, 3));
+
+        if (rol_out)
+            *rol_out = sqlite3_column_int(stmt, 4);
+
         rc = 0;
-    } else {
-        fprintf(stderr, "[DB] Error insertando Billete: %s\n",
-                sqlite3_errmsg(DB(db)));
     }
 
     sqlite3_finalize(stmt);
     return rc;
 }
 
-
-static int db_billete_asiento_libre(void *db, int id_vuelo,
-                                    char *asiento_out) {
-
-    sqlite3_stmt *stmt;
-    int capacidad = 0;
-
-    sqlite3_prepare_v2(DB(db),
-        "SELECT CAPACIDAD FROM Vuelo WHERE ID_VUELO = ?",
-        -1, &stmt, NULL);
-    sqlite3_bind_int(stmt, 1, id_vuelo);
-
-    if (sqlite3_step(stmt) == SQLITE_ROW)
-        capacidad = sqlite3_column_int(stmt, 0);
-    sqlite3_finalize(stmt);
-
-    if (capacidad <= 0) return -1;  /* vuelo no existe */
-
-    sqlite3_prepare_v2(DB(db),
-        "SELECT ASIENTO FROM Billete WHERE ID_VUELO = ?",
-        -1, &stmt, NULL);
-    sqlite3_bind_int(stmt, 1, id_vuelo);
-
-    char ocupados[1024][8];
-    int num_ocupados = 0;
-
-    while (sqlite3_step(stmt) == SQLITE_ROW && num_ocupados < 1024) {
-        const char *a = (const char *)sqlite3_column_text(stmt, 0);
-        if (a) {
-            strncpy(ocupados[num_ocupados], a, 7);
-            ocupados[num_ocupados][7] = '\0';
-            num_ocupados++;
-        }
-    }
-    sqlite3_finalize(stmt);
-
-    const char letras[] = {'A', 'B', 'C', 'D', 'E', 'F'};
-    int asientos_por_fila = 6;
-    int filas = (capacidad + asientos_por_fila - 1) / asientos_por_fila;
-
-    for (int fila = 1; fila <= filas; fila++) {
-        for (int col = 0; col < asientos_por_fila; col++) {
-            if ((fila - 1) * asientos_por_fila + col >= capacidad) break;
-
-            char candidato[8];
-            snprintf(candidato, sizeof(candidato), "%d%c", fila, letras[col]);
-
-            int ocupado = 0;
-            for (int k = 0; k < num_ocupados; k++) {
-                if (strcmp(ocupados[k], candidato) == 0) {
-                    ocupado = 1;
-                    break;
-                }
-            }
-
-            if (!ocupado) {
-                strcpy(asiento_out, candidato);
-                return 0;
-            }
-        }
-    }
-
-    return -1;
-}
-
-
-char *db_comprar_billete_texto(void *db, int id_usuario,
+char *db_comprar_billete_texto(void *db,
+                               int id_usuario,
                                const char *cod_vuelo) {
-    char *resultado = (char *)malloc(512);
-    if (!resultado) return NULL;
 
     sqlite3_stmt *stmt;
-    int id_vuelo = -1;
+    char *resultado = (char *)malloc(512);
+
+    if (!resultado)
+        return NULL;
 
     sqlite3_prepare_v2(DB(db),
-        "SELECT ID_VUELO FROM Vuelo WHERE COD_VUELO = ?",
-        -1, &stmt, NULL);
+        "SELECT ID_VUELO FROM Vuelo WHERE COD_VUELO=?",
+        -1,
+        &stmt,
+        NULL);
+
     sqlite3_bind_text(stmt, 1, cod_vuelo, -1, SQLITE_TRANSIENT);
 
-    if (sqlite3_step(stmt) == SQLITE_ROW)
+    int id_vuelo = -1;
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
         id_vuelo = sqlite3_column_int(stmt, 0);
+    }
+
     sqlite3_finalize(stmt);
 
     if (id_vuelo == -1) {
-        snprintf(resultado, 512, "ERROR|Vuelo '%s' no encontrado", cod_vuelo);
+        strcpy(resultado, "ERROR|Vuelo no encontrado");
         return resultado;
     }
 
-    char asiento[8];
-    if (db_billete_asiento_libre(db, id_vuelo, asiento) != 0) {
-        snprintf(resultado, 512, "ERROR|El vuelo '%s' esta lleno", cod_vuelo);
+    sqlite3_prepare_v2(DB(db),
+        "INSERT INTO Billete(ID_USUARIO, ID_VUELO, ASIENTO, FECHA_COMPRA) "
+        "VALUES(?, ?, 'AUTO', datetime('now'))",
+        -1,
+        &stmt,
+        NULL);
+
+    sqlite3_bind_int(stmt, 1, id_usuario);
+    sqlite3_bind_int(stmt, 2, id_vuelo);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        strcpy(resultado, "ERROR|No se pudo comprar el billete");
+        sqlite3_finalize(stmt);
         return resultado;
     }
 
-    time_t t = time(NULL);
-    struct tm *tm_info = localtime(&t);
-    char fecha[32];
-    strftime(fecha, sizeof(fecha), "%Y-%m-%d", tm_info);
+    sqlite3_finalize(stmt);
 
-    // Insertar billete
-    int id_billete = -1;
-    if (db_billete_insertar(db, id_usuario, id_vuelo,
-                            asiento, fecha, &id_billete) != 0) {
-        snprintf(resultado, 512, "ERROR|No se pudo insertar el billete");
-        return resultado;
-    }
-
-    snprintf(resultado, 512,
+    snprintf(resultado,
+             512,
              "OK|Billete comprado correctamente\n"
-             "Vuelo   : %s\n"
-             "Asiento : %s\n"
-             "Fecha   : %s\n"
-             "ID      : %d",
-             cod_vuelo, asiento, fecha, id_billete);
+             "Usuario: %d\n"
+             "Vuelo: %s\n",
+             id_usuario,
+             cod_vuelo);
 
     return resultado;
 }
