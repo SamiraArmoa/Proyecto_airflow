@@ -206,8 +206,14 @@ void Controlador::ejecutarMenuAdmin() {
 
     do {
         mostrarMenuAdmin();
-        std::cin >> opcion;
-        std::cin.ignore();
+        if (!(std::cin >> opcion)) {
+            std::cout << "\n[ERROR] Por favor, introduce un numero valido.\n";
+            std::cin.clear();
+            std::cin.ignore(10000, '\n');
+            pausar();
+            continue;
+        }
+        std::cin.ignore(10000, '\n');
 
         switch (opcion) {
             case 1: {
@@ -285,8 +291,14 @@ void Controlador::ejecutarMenuEmpleado() {
 
     do {
         mostrarMenuEmpleado();
-        std::cin >> opcion;
-        std::cin.ignore();
+        if (!(std::cin >> opcion)) {
+            std::cout << "\n[ERROR] Por favor, introduce un numero valido.\n";
+            std::cin.clear();
+            std::cin.ignore(10000, '\n');
+            pausar();
+            continue;
+        }
+        std::cin.ignore(10000, '\n');
 
         switch (opcion) {
             case 1:
@@ -356,8 +368,15 @@ void Controlador::ejecutarMenuPasajero() {
 
     do {
         mostrarMenuPasajero();
-        std::cin >> opcion;
-        std::cin.ignore();
+        
+        if (!(std::cin >> opcion)) {
+            std::cout << "\n[ERROR] Por favor, introduce un numero valido.\n";
+            std::cin.clear();
+            std::cin.ignore(10000, '\n');
+            pausar();
+            continue;
+        }
+        std::cin.ignore(10000, '\n');
 
         switch (opcion) {
                     case 1:
