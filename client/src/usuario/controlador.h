@@ -1,12 +1,5 @@
-/*
- * controlador.h
- *
- *  Created on: 19 may 2026
- *      Author: oier.artabe
- */
-
-#ifndef CLIENT_SRC_USUARIO_CONTROLADOR_H_
-#define CLIENT_SRC_USUARIO_CONTROLADOR_H_
+#ifndef CONTROLADOR_H
+#define CONTROLADOR_H
 
 #include <string>
 #include "clientSocket.h"
@@ -27,6 +20,8 @@ private:
 
     bool salirPrograma;
 
+    int idUsuarioAutenticado;
+
     std::string extraerContenido(const std::string &respuesta);
     void pausar();
 
@@ -39,7 +34,6 @@ private:
     void invalidarCache();
 
     void buscarVueloPorCodigo();
-
     void buscarVuelosOrigenDestino();
     void comprarBillete();
 
@@ -54,4 +48,4 @@ public:
     void ejecutar();
 };
 
-#endif /* CLIENT_SRC_USUARIO_CONTROLADOR_H_ */
+#endif /* CONTROLADOR_H */

@@ -150,3 +150,83 @@
 [2026-05-21 11:24:01] Peticion recibida: SALIR
 [2026-05-21 11:24:01] Conexion con cliente cerrada
 [2026-05-21 11:24:01] Esperando cliente
+[2026-05-23 11:49:20] Servidor iniciado
+[2026-05-23 11:49:20] Base de datos abierta correctamente
+[2026-05-23 11:49:20] Servidor escuchando en puerto 5000
+[2026-05-23 11:49:20] Esperando cliente
+[2026-05-23 11:49:26] Cliente conectado
+[2026-05-23 11:49:33] Peticion recibida: LOGIN|admin|1234
+[2026-05-23 11:49:33] Login correcto: ADMIN
+[2026-05-23 11:50:21] Peticion recibida: CARGAR_CSV
+[2026-05-23 11:50:22] Peticion recibida: LISTAR_AEROPUERTOS
+[2026-05-23 11:50:24] Peticion recibida: LISTAR_VUELOS
+[2026-05-23 11:50:26] Peticion recibida: LISTAR_USUARIOS
+[2026-05-23 11:50:27] Peticion recibida: LISTAR_EQUIPAJES
+[2026-05-23 11:50:45] Peticion recibida: BUSCAR_VUELO|V124
+[2026-05-23 11:51:00] Peticion recibida: BUSCAR_VUELOS_ORIGEN_DESTINO|PEK|ATH
+[2026-05-23 11:51:58] Peticion recibida: LOGIN|empleado|abcd
+[2026-05-23 11:51:58] Login correcto: EMPLEADO
+[2026-05-23 11:52:08] Peticion recibida: BUSCAR_VUELO|V100
+[2026-05-23 11:52:18] Peticion recibida: BUSCAR_VUELOS_ORIGEN_DESTINO|PEK|ATH
+[2026-05-23 11:53:10] Peticion recibida: LOGIN|pasajero|1111
+[2026-05-23 11:53:10] Login correcto: PASAJERO
+[2026-05-23 11:53:30] Peticion recibida: BUSCAR_VUELO|v112
+[2026-05-23 11:53:45] Peticion recibida: BUSCAR_VUELO|V100
+[2026-05-23 11:54:03] Peticion recibida: BUSCAR_VUELOS_ORIGEN_DESTINO|PEK|ATH
+[2026-05-23 11:54:08] Peticion recibida: BUSCAR_VUELO|V100
+[2026-05-23 11:54:11] Peticion recibida: COMPRAR_BILLETE|V100
+[2026-05-23 11:56:26] Peticion recibida: BUSCAR_VUELO|V112
+[2026-05-23 11:56:33] Peticion recibida: SALIR
+[2026-05-23 11:56:33] Conexion con cliente cerrada
+[2026-05-23 11:56:33] Esperando cliente
+[2026-05-23 12:12:56] Servidor iniciado
+[2026-05-23 12:12:56] Base de datos abierta correctamente
+[2026-05-23 12:12:56] Servidor escuchando en puerto 5000
+[2026-05-23 12:12:56] Esperando cliente
+[2026-05-23 12:13:03] Cliente conectado
+[2026-05-23 12:13:09] Peticion recibida: LOGIN|pasajero|1111
+[2026-05-23 12:13:09] Login correcto: PASAJERO
+[2026-05-23 12:13:22] Peticion recibida: LOGIN|admin|1234
+[2026-05-23 12:13:22] Login correcto: ADMIN
+[2026-05-23 12:13:27] Peticion recibida: CARGAR_CSV
+[2026-05-23 12:13:36] Peticion recibida: LOGIN|empleado|abcd
+[2026-05-23 12:13:36] Login correcto: EMPLEADO
+[2026-05-23 12:13:44] Peticion recibida: LOGIN|pasajero|1111
+[2026-05-23 12:13:44] Login correcto: PASAJERO
+[2026-05-23 12:14:44] Peticion recibida: LOGIN|juan@gmail.com|1234
+[2026-05-23 12:14:44] Login incorrecto para usuario: juan@gmail.com
+[2026-05-23 12:15:00] Peticion recibida: LOGIN|pasajero|1234
+[2026-05-23 12:15:00] Login incorrecto para usuario: pasajero
+[2026-05-23 12:15:06] Peticion recibida: LOGIN||
+[2026-05-23 12:15:06] Intento de login con formato incorrecto
+[2026-05-23 12:16:53] Peticion recibida: LOGIN|1|1111
+[2026-05-23 12:16:53] Login incorrecto para usuario: 1
+[2026-05-23 12:18:08] Peticion recibida: LOGIN|admin|1234
+[2026-05-23 12:18:08] Login correcto: ADMIN
+[2026-05-23 12:18:10] Peticion recibida: LISTAR_USUARIOS
+[2026-05-23 12:18:30] Peticion recibida: LOGIN|elena.leon360@gmail.com|1111
+[2026-05-23 12:18:30] Login incorrecto para usuario: elena.leon360@gmail.com
+[2026-05-23 12:18:39] Peticion recibida: LOGIN|elena.leon360@gmail.com|1234
+[2026-05-23 12:18:39] Login incorrecto para usuario: elena.leon360@gmail.com
+[2026-05-23 12:19:54] Peticion recibida: LOGIN||
+[2026-05-23 12:19:54] Intento de login con formato incorrecto
+[2026-05-23 12:20:00] Peticion recibida: LOGIN|admin|1234
+[2026-05-23 12:20:00] Login correcto: ADMIN
+[2026-05-23 12:20:03] Peticion recibida: SALIR
+[2026-05-23 12:20:03] Conexion con cliente cerrada
+[2026-05-23 12:20:03] Esperando cliente
+[2026-05-23 12:20:55] Servidor iniciado
+[2026-05-23 12:20:55] Base de datos abierta correctamente
+[2026-05-23 12:20:55] Servidor escuchando en puerto 5000
+[2026-05-23 12:20:55] Esperando cliente
+[2026-05-23 12:21:02] Cliente conectado
+[2026-05-23 12:21:06] Peticion recibida: LOGIN|admin|1234
+[2026-05-23 12:21:06] Login correcto: ADMIN
+[2026-05-23 12:21:14] Peticion recibida: LOGIN|empleado|abcd
+[2026-05-23 12:21:14] Login correcto: EMPLEADO
+[2026-05-23 12:21:18] Peticion recibida: LOGIN||
+[2026-05-23 12:21:18] Intento de login con formato incorrecto
+[2026-05-23 12:21:23] Peticion recibida: LOGIN|pasajero|1111
+[2026-05-23 12:21:23] Login correcto: PASAJERO
+[2026-05-23 12:21:29] Peticion recibida: BUSCAR_VUELO|V100
+[2026-05-23 12:21:30] Peticion recibida: COMPRAR_BILLETE|1|V100
