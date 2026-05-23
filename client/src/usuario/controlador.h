@@ -36,6 +36,7 @@ private:
     void buscarVueloPorCodigo();
     void buscarVuelosOrigenDestino();
     void comprarBillete();
+    void verMisBilletes();
 
     void ejecutarMenuAdmin();
     void ejecutarMenuEmpleado();

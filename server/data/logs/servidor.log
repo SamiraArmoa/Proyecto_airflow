@@ -230,3 +230,49 @@
 [2026-05-23 12:21:23] Login correcto: PASAJERO
 [2026-05-23 12:21:29] Peticion recibida: BUSCAR_VUELO|V100
 [2026-05-23 12:21:30] Peticion recibida: COMPRAR_BILLETE|1|V100
+[2026-05-23 12:33:01] Peticion recibida: SALIR
+[2026-05-23 12:33:01] Conexion con cliente cerrada
+[2026-05-23 12:33:01] Esperando cliente
+[2026-05-23 12:44:42] Servidor iniciado
+[2026-05-23 12:44:42] Base de datos abierta correctamente
+[2026-05-23 12:44:42] Servidor escuchando en puerto 5000
+[2026-05-23 12:44:42] Esperando cliente
+[2026-05-23 12:44:49] Cliente conectado
+[2026-05-23 12:44:55] Peticion recibida: LOGIN|admin|1234
+[2026-05-23 12:44:55] Login correcto: ADMIN
+[2026-05-23 12:45:02] Peticion recibida: LOGIN||
+[2026-05-23 12:45:02] Intento de login con formato incorrecto
+[2026-05-23 12:45:08] Peticion recibida: LOGIN|empleado|abcd
+[2026-05-23 12:45:08] Login correcto: EMPLEADO
+[2026-05-23 12:45:16] Peticion recibida: LOGIN|pasajero|1111
+[2026-05-23 12:45:16] Login correcto: PASAJERO
+[2026-05-23 12:45:21] Peticion recibida: BUSCAR_VUELO|V112
+[2026-05-23 12:45:22] Peticion recibida: COMPRAR_BILLETE|1|V112
+[2026-05-23 12:45:32] Peticion recibida: VER_MIS_BILLETES
+[2026-05-23 12:45:46] Peticion recibida: BUSCAR_VUELO|V098
+[2026-05-23 12:45:48] Peticion recibida: COMPRAR_BILLETE|1|V098
+[2026-05-23 12:45:55] Peticion recibida: VER_MIS_BILLETES
+[2026-05-23 12:46:03] Peticion recibida: SALIR
+[2026-05-23 12:46:03] Conexion con cliente cerrada
+[2026-05-23 12:46:03] Esperando cliente
+[2026-05-23 12:52:32] Servidor iniciado
+[2026-05-23 12:52:32] Base de datos abierta correctamente
+[2026-05-23 12:52:32] Servidor escuchando en puerto 5000
+[2026-05-23 12:52:32] Esperando cliente
+[2026-05-23 12:52:38] Cliente conectado
+[2026-05-23 12:52:43] Peticion recibida: LOGIN|pasajero|1111
+[2026-05-23 12:52:43] Login correcto: PASAJERO
+[2026-05-23 12:52:46] Peticion recibida: VER_MIS_BILLETES
+[2026-05-23 12:52:51] Peticion recibida: BUSCAR_VUELO|V100
+[2026-05-23 12:52:54] Peticion recibida: COMPRAR_BILLETE|1|V100
+[2026-05-23 12:52:59] Peticion recibida: VER_MIS_BILLETES
+[2026-05-23 12:53:12] Peticion recibida: SALIR
+[2026-05-23 12:53:12] Conexion con cliente cerrada
+[2026-05-23 12:53:12] Esperando cliente
+[2026-05-23 12:53:17] Cliente conectado
+[2026-05-23 12:53:23] Peticion recibida: LOGIN|pasajero|1111
+[2026-05-23 12:53:23] Login correcto: PASAJERO
+[2026-05-23 12:53:25] Peticion recibida: VER_MIS_BILLETES
+[2026-05-23 12:53:35] Peticion recibida: SALIR
+[2026-05-23 12:53:35] Conexion con cliente cerrada
+[2026-05-23 12:53:35] Esperando cliente

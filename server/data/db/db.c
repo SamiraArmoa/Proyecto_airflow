@@ -768,3 +768,62 @@ char *db_comprar_billete_texto(void *db,
 
     return resultado;
 }
+
+
+char *db_billetes_usuario_texto(void *db, int id_usuario) {
+    sqlite3_stmt *stmt;
+    char *resultado = (char *)malloc(20000);
+
+    if (!resultado) return NULL;
+
+    resultado[0] = '\0';
+
+    sqlite3_prepare_v2(DB(db),
+        "SELECT b.ID_BILLETE, v.COD_VUELO, "
+        "a1.CODIGO, a2.CODIGO, "
+        "v.FECHA_HORA, b.ASIENTO, b.FECHA_COMPRA "
+        "FROM Billete b "
+        "JOIN Vuelo v ON b.ID_VUELO = v.ID_VUELO "
+        "LEFT JOIN Aeropuerto a1 ON v.ID_ORIGEN = a1.ID_A "
+        "LEFT JOIN Aeropuerto a2 ON v.ID_DESTINO = a2.ID_A "
+        "WHERE b.ID_USUARIO = ?",
+        -1, &stmt, NULL);
+
+    sqlite3_bind_int(stmt, 1, id_usuario);
+
+    append_text(resultado, 20000,
+        "\nMIS BILLETES:\n");
+    append_text(resultado, 20000,
+        "ID | VUELO | ORIGEN | DESTINO | FECHA VUELO | ASIENTO | FECHA COMPRA\n");
+
+    int encontrados = 0;
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        char linea[512];
+
+        snprintf(linea, sizeof(linea),
+            "%d | %s | %s | %s | %s | %s | %s\n",
+            sqlite3_column_int(stmt, 0),
+            sqlite3_column_text(stmt, 1),
+            sqlite3_column_text(stmt, 2),
+            sqlite3_column_text(stmt, 3),
+            sqlite3_column_text(stmt, 4),
+            sqlite3_column_text(stmt, 5),
+            sqlite3_column_text(stmt, 6));
+
+        append_text(resultado, 20000, linea);
+        encontrados++;
+    }
+
+    sqlite3_finalize(stmt);
+
+    if (encontrados == 0) {
+        strcpy(resultado, "ERROR|No tienes billetes comprados");
+    }
+
+    return resultado;
+}
+
+int db_limpiar_billetes(void *db) {
+        return exec_simple(DB(db), "DELETE FROM Billete;");
+}

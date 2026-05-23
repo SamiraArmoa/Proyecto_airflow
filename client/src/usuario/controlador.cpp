@@ -123,6 +123,19 @@ void Controlador::comprarBillete() {
     pausar();
 }
 
+void Controlador::verMisBilletes() {
+    if (idUsuarioAutenticado == -1) {
+        std::cout << "\nERROR|No hay usuario autenticado\n";
+        pausar();
+        return;
+    }
+
+    std::string respuesta = cliente.enviarPeticion("VER_MIS_BILLETES");
+
+    std::cout << "\n" << extraerContenido(respuesta) << "\n";
+    pausar();
+}
+
 std::string Controlador::hacerLogin() {
     std::string usuario;
     std::string password;
@@ -214,8 +227,9 @@ void Controlador::mostrarMenuPasajero() {
     std::cout << "3. Buscar vuelo por codigo\n";
     std::cout << "4. Buscar vuelos por origen y destino\n";
     std::cout << "5. Comprar billete\n";
-    std::cout << "6. Cambiar usuario\n";
-    std::cout << "7. Salir\n";
+    std::cout << "6. Ver mis billetes\n";
+    std::cout << "7. Cambiar usuario\n";
+    std::cout << "8. Salir\n";
     std::cout << "\nOpcion: ";
 }
 
@@ -440,10 +454,14 @@ void Controlador::ejecutarMenuPasajero() {
                 break;
 
             case 6:
-                std::cout << "Cambiando usuario...\n";
+                verMisBilletes();
                 break;
 
             case 7:
+                std::cout << "Cambiando usuario...\n";
+                break;
+
+            case 8:
                 std::cout << extraerContenido(cliente.enviarPeticion("SALIR")) << "\n";
                 salirPrograma = true;
                 break;
@@ -454,7 +472,7 @@ void Controlador::ejecutarMenuPasajero() {
                 break;
         }
 
-    } while (opcion != 6 && opcion != 7);
+    } while (opcion != 7 && opcion != 8);
 }
 
 void Controlador::ejecutar() {

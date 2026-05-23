@@ -6,13 +6,13 @@ extern "C"
 {
 #endif
 
-//Conexion
+// Conexion
 void *db_abrir(const char *ruta);
 void db_cerrar(void *db);
 int db_inicializar(void *db);
 int db_activar_fk(void *db);
 
-//Usuario
+// Usuario
 int db_usuario_insertar(void *db,
                         const char *dni,
                         const char *nombre,
@@ -50,7 +50,7 @@ int db_usuario_buscar_email(void *db,
 
 int db_usuario_listar(void *db);
 
-//Aeropuerto
+// Aeropuerto
 int db_aeropuerto_insertar(void *db,
                            const char *codigo,
                            const char *nombre,
@@ -79,7 +79,7 @@ int db_aeropuerto_buscar_codigo(void *db,
 
 int db_aeropuerto_listar(void *db);
 
-//Vuelo
+// Vuelo
 int db_vuelo_insertar(void *db,
                       const char *cod_vuelo,
                       int id_origen,
@@ -115,7 +115,7 @@ int db_vuelo_asientos_disponibles(void *db,
                                   int id_vuelo,
                                   int *disp_out);
 
-//Billete
+// Billete
 int db_billete_insertar(void *db,
                         int id_usuario,
                         int id_vuelo,
@@ -136,7 +136,7 @@ int db_billete_listar_por_usuario(void *db, int id_usuario);
 
 int db_billete_listar_por_vuelo(void *db, int id_vuelo);
 
-//Equipaje
+// Equipaje
 int db_equipaje_insertar(void *db,
                          const char *codigo,
                          const char *dni,
@@ -158,39 +158,38 @@ int db_equipaje_listar_por_billete(void *db, int id_billete);
 
 int db_equipaje_listar(void *db);
 
-//Consultas join
+// Consultas join
 int db_pasajeros_por_vuelo(void *db, int id_vuelo);
 
 int db_equipaje_por_usuario(void *db, int id_usuario);
 
-//Cargar csvs
+// Cargar CSVs
 int db_cargar_aeropuertos_csv(void *db, const char *ruta);
-
 int db_cargar_vuelos_csv(void *db, const char *ruta);
-
 int db_cargar_usuarios_csv(void *db, const char *ruta);
-
 int db_cargar_equipajes_csv(void *db, const char *ruta);
 
-//Funciones para sockets cliente-servidor
+// Funciones para sockets cliente-servidor
 char *db_aeropuerto_listar_texto(void *db);
-
 char *db_vuelo_listar_texto(void *db);
-
 char *db_usuario_listar_texto(void *db);
-
 char *db_equipaje_listar_texto(void *db);
 
 char *db_vuelo_buscar_codigo_texto(void *db, const char *codigo);
 
-char *db_vuelos_buscar_origen_destino_texto(void *db, const char *origen, const char *destino);
+char *db_vuelos_buscar_origen_destino_texto(void *db,
+                                            const char *origen,
+                                            const char *destino);
 
-//Funciones billete
-int db_billete_listar_por_vuelo(void *db, int id_vuelo);
+// Funciones billete para sockets
+char *db_comprar_billete_texto(void *db,
+                               int id_usuario,
+                               const char *cod_vuelo);
 
-char *db_comprar_billete_texto(void *db, int id_usuario, const char *cod_vuelo);
+char *db_billetes_usuario_texto(void *db,
+                                int id_usuario);
 
-int db_pasajeros_por_vuelo(void *db, int id_vuelo);
+int db_limpiar_billetes(void *db);
 
 #ifdef __cplusplus
 }

@@ -243,6 +243,35 @@ std::string procesarPeticion(const std::string &peticion) {
         return respuesta;
     }
 
+    if (peticion.rfind("VER_MIS_BILLETES", 0) == 0) {
+    int idUsuario = idUsuarioActual;
+
+    std::vector<std::string> partes = dividir(peticion, '|');
+
+    if (partes.size() == 2) {
+        idUsuario = atoi(partes[1].c_str());
+    }
+
+    if (idUsuario <= 0) {
+        return "ERROR|No hay usuario autenticado";
+    }
+
+    char *texto = db_billetes_usuario_texto(db, idUsuario);
+
+    if (!texto) {
+        return "ERROR|No se pudieron obtener los billetes";
+    }
+
+    std::string respuesta = texto;
+    free(texto);
+
+    if (respuesta.rfind("ERROR|", 0) == 0) {
+        return respuesta;
+    }
+
+    return "DATA|" + respuesta;
+}
+
     if (peticion == "SALIR") {
         idUsuarioActual = -1;
         return "OK|Cliente desconectado";
@@ -275,6 +304,7 @@ int main() {
 
     db_activar_fk(db);
     db_inicializar(db);
+    db_limpiar_billetes(db);
 
     escribirLog("Servidor iniciado");
     escribirLog("Base de datos abierta correctamente");
